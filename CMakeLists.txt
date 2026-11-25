@@ -36,8 +36,10 @@ function(tmu_plugin target)
     cmake_parse_arguments(P "INSTRUMENT" "NAME;CODE;DIR;AAX_CAT;VST3_CAT" "SOURCES" ${ARGN})
     if(P_INSTRUMENT)
         set(synth TRUE)
+        set(au_type kAudioUnitType_MusicDevice)
     else()
         set(synth FALSE)
+        set(au_type kAudioUnitType_Effect)
     endif()
     juce_add_plugin(${target}
         COMPANY_NAME "T-MU"
@@ -56,7 +58,7 @@ function(tmu_plugin target)
         COPY_PLUGIN_AFTER_BUILD FALSE
         AAX_CATEGORY ${P_AAX_CAT}
         VST3_CATEGORIES ${P_VST3_CAT}
-        AU_MAIN_TYPE $<IF:$<BOOL:${synth}>,kAudioUnitType_MusicDevice,kAudioUnitType_Effect>)
+        AU_MAIN_TYPE ${au_type})
 
     file(GLOB skin_files CONFIGURE_DEPENDS "${P_DIR}/skin/*")
     juce_add_binary_data(${target}_Data NAMESPACE BinaryData SOURCES ${skin_files} "${CMAKE_SOURCE_DIR}/shared/fonts/Inter-Bold.otf")
