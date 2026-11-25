@@ -1,0 +1,69 @@
+# Builds the T-MU plugins for macOS and Windows and puts the installers on the Releases page.
+name: Build plugins
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  mac:
+    name: macOS (VST3, AU, AAX)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (Apple chip + Intel in one)
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+          cmake --build build --config Release -j 4
+      - name: Make the installer
+        run: bash installer/mac_pkg.sh build "${{ github.run_number }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac
+          path: dist/*
+
+  windows:
+    name: Windows (VST3, AAX)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          cmake -B build -G "Visual Studio 17 2022" -A x64
+          cmake --build build --config Release -j 4
+      - name: Make the installer
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress; }
+          & $iscc /DBuildNum=${{ github.run_number }} installer\windows.iss
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          Compress-Archive -Path "build\*_artefacts\Release\VST3\*.vst3" -DestinationPath "dist\T-MU-Plugins-Windows-VST3-only.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/*
+
+  release:
+    name: Put the installers on the Releases page
+    needs: [mac, windows]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "build-${{ github.run_number }}" dist/* \
+            --repo "${{ github.repository }}" \
+            --title "T-MU Plugins (build ${{ github.run_number }})" \
+            --notes "Melt Channel, Melt Stutter and Melt Deck. Mac: open the .pkg. Windows: run the Setup .exe. See the README for first-time steps." \
+            --latest
