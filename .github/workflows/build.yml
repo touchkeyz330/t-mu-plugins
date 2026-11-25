@@ -12,9 +12,9 @@ permissions:
 jobs:
   mac:
     name: macOS (VST3, AU, AAX)
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build (Apple chip + Intel in one)
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
@@ -30,10 +30,10 @@ jobs:
     name: Windows (VST3, AAX)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build
         run: |
-          cmake -B build -G "Visual Studio 17 2022" -A x64
+          cmake -B build -A x64
           cmake --build build --config Release -j 4
       - name: Make the installer
         shell: pwsh
