@@ -12,7 +12,8 @@ permissions:
 jobs:
   mac:
     name: macOS (VST3, AU, AAX)
-    runs-on: macos-15
+    runs-on: macos-15-intel
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v5
       - name: Build (Apple chip + Intel in one)
@@ -52,7 +53,8 @@ jobs:
     name: Put the installers on the Releases page
     needs: [mac, windows]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    # release whatever finished: Windows still goes out if the Mac build is delayed
+    if: always() && (needs.mac.result == 'success' || needs.windows.result == 'success')
     steps:
       - uses: actions/download-artifact@v4
         with:
