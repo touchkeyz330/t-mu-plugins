@@ -99,7 +99,8 @@ enum : int
     kBrowseOpen = kBrowseLine1 + 8, kBrowseBack, kBrowseLoadA, kBrowseLoadB, kBrowseAdd, kBrowsePgUp, kBrowsePgDn, kBrowseDrives,
     kJogMode,
     kPadMap, kPadLearn, kPadInfo, kAddSet, kLoadNext, kLearn1,
-    kNumParams = kLearn1 + 16
+    kASeek = kLearn1 + 16, kBSeek,
+    kNumParams
 };
 // FX pads (bottom row first)
 enum { PF_LP, PF_HP, PF_CENSOR, PF_SPIN, PF_GATE2, PF_GATE4, PF_FLANGE, PF_CRUSH,
@@ -273,6 +274,7 @@ struct Deck
     float holdBpm = 120, brakeAmt = 1, jogVel = 0, rateNow = 1, bpmNow = 0;
     // scratch: the play head follows the platter while it is being turned
     bool scratching = false; double scratchTarget = 0; float scratchHold = 0, scratchVel = 0;
+    float seekHold = 0;              // the seek bar was just moved: don't move it under the finger
     int nudge = 0;
     double loopStart = 0, loopEnd = 0;
     float jumpBeats = 16;
@@ -464,6 +466,8 @@ public:
             std::snprintf(id, sizeof id, "learn%d", k + 1); std::snprintf(nm, sizeof nm, "Pad %d Note", k + 1);
             addParam(mpc::intParam(id, nm, 0, 127, kMpcBankA[k]));
         }
+        addParam(mpc::floatParam("aseek", "A Seek", 0.0f, 1.0f, 0.0f, "", 3));
+        addParam(mpc::floatParam("bseek", "B Seek", 0.0f, 1.0f, 0.0f, "", 3));
         notify_.reset(new std::atomic<uint8_t>[kNumParams]);
         for (int i = 0; i < kNumParams; ++i) notify_[i].store(0);
         lastSeen_.assign(kNumParams, 0.0f);
@@ -828,8 +832,24 @@ private:
             const int t = addFile(L->items[(size_t)idx].path);
             if (t < 0) return;
             if (std::find(browsed_.begin(), browsed_.end(), t) == browsed_.end()) browsed_.push_back(t);
+            // every song in this folder (up to 500 around the one you picked) becomes the deck's list,
+            // so turning the song name on the deck goes through all of them
+            std::vector<int> all;
+            const int n = (int)L->items.size();
+            const int from = std::max(0, std::min(idx - 250, n - 500)), to = std::min(n, from + 500);
+            for (int k = from; k < to; ++k)
+                if (!L->items[(size_t)k].dir)
+                {
+                    const int u = k == idx ? t : addFile(L->items[(size_t)k].path);
+                    if (u >= 0) all.push_back(u);
+                }
+            std::string name = L->title.empty() ? std::string("Folder") : mdlib::cleanName(L->title);
+            if (name.size() > 22) name = name.substr(0, 22);
+            bool found = false;
+            for (auto& c : addedCrates_) if (c.name == name) { c.tracks = all; found = true; }
+            if (!found) addedCrates_.push_back(Crate{ name, all });
             buildView();
-            selCrate_ = "Browsed Songs"; selTrack_.store(t); selDeck_.store(deck);
+            selCrate_ = name; selTrack_.store(t); selDeck_.store(deck);
         }
         else if (type == 3 && idx >= 0 && idx < (int)L->items.size())
         {   // ADD TO SET: append one song to the SET LIST crate, in the order you add them
@@ -1109,7 +1129,7 @@ private:
             return o <= oHot3 || o == oJog || o == oLoopSize;
         }
         if (i == kRescan || (i >= kFxPad1 && i < kFxPad1 + 16)) return true;
-        if (i == kPadLearn || i == kAddSet || i == kLoadNext) return true;
+        if (i == kPadLearn || i == kAddSet || i == kLoadNext || i == kASeek || i == kBSeek) return true;
         if (i == kBrowseSel || i == kBrowseRow || (i >= kBrowseOpen && i <= kBrowseDrives)) return true;
         return i >= kBpmUp && i <= kNudgeUp ? true : i == kSamplerPlay;
     }
@@ -1217,6 +1237,16 @@ private:
                 break;
             }
             case kLoadNext: loadNext(); break;
+            case kASeek: case kBSeek:
+            {   // drag along the song's waveform: jump anywhere in it, playing or not
+                Deck& d = deck_[i == kBSeek ? 1 : 0];
+                if (!d.live || (i == kBSeek && !twoDecks_)) break;
+                d.scratching = false;
+                jumpTo(d, getNormalised(i) * std::max(0.0, (double)d.live->frames - d.live->rate * 0.25));
+                d.seekHold = 0.5f;
+                dirtyNow_ = true;
+                break;
+            }
             case kBrowseBack: postBrowse(3, -1); break;
             case kBrowseOpen:
             {
@@ -1574,7 +1604,12 @@ private:
         if (!d.live) return;
         if (d.cuePreview) { d.cuePreview = false; dirtyNow_ = true; return; }   // CDJ: play while holding cue keeps playing
         if (d.playing && !d.braking) d.playing = false;
-        else { d.playing = true; d.braking = false; d.brakeAmt = 1; if (d.synced) alignPhase(i); }
+        else
+        {
+            if (d.pos >= (double)d.live->frames - d.live->rate * 0.5)          // at the very end: play from the cue
+                jumpTo(d, d.cuePos > (double)d.live->frames - d.live->rate * 2.0 ? 0.0 : d.cuePos);
+            d.playing = true; d.braking = false; d.brakeAmt = 1; if (d.synced) alignPhase(i);
+        }
         dirtyNow_ = true;
     }
     void cueDown(int i)
@@ -1584,7 +1619,8 @@ private:
         if (d.playing && !d.cuePreview) { d.playing = false; d.braking = false; d.brakeAmt = 1; jumpTo(d, d.cuePos); }
         else if (!d.playing)
         {
-            if (std::fabs(d.pos - d.cuePos) > 64) d.cuePos = d.pos;
+            // CDJ: a paused deck sets the cue where it is (but never in the last 2 seconds)
+            if (std::fabs(d.pos - d.cuePos) > 64 && d.pos < (double)d.live->frames - d.live->rate * 2.0) d.cuePos = d.pos;
             else d.pos = d.cuePos;
             d.playing = true; d.cuePreview = true;
         }
@@ -1851,7 +1887,13 @@ private:
                 }
                 else d.pos += rate;
                 if (d.looping && d.pos >= d.loopEnd) { d.xfPos = d.pos; d.xfLeft = 128; d.pos -= (d.loopEnd - d.loopStart); }
-                if (d.pos >= (double)d.live->frames - 4) { d.pos = (double)d.live->frames - 4; d.playing = false; d.cuePreview = false; dirtyNow_ = true; }
+                if (d.pos >= (double)d.live->frames - 4)
+                {   // the song ended: stop and go back to the cue point (or the start, if the cue was at the end)
+                    d.playing = false; d.cuePreview = false; d.scratching = false;
+                    if (d.cuePos > (double)d.live->frames - d.live->rate * 2.0) d.cuePos = 0;
+                    d.pos = d.cuePos; d.xfLeft = 0;
+                    dirtyNow_ = true;
+                }
 
                 // isolator EQ + filter
                 float y[2] = { l, r };
@@ -2035,6 +2077,13 @@ private:
         msgClock_.store(msgClock_.load() + dt);
         if (guard_ > 0) return;              // just after a project/state load: leave the restored values alone
         publishBrowser();
+        for (int i = 0; i < 2; ++i)
+        {   // the seek bar follows the song (unless a finger just moved it)
+            Deck& d = deck_[i];
+            d.seekHold -= (float)n / sr_;
+            if (d.live && d.seekHold <= 0 && d.live->frames > 0)
+                writeParam(i ? kBSeek : kASeek, (float)std::round(d.pos / (double)d.live->frames * 400.0) / 400.0f);
+        }
         for (int i = 0; i < 2; ++i)
         {
             Deck& d = deck_[i];
