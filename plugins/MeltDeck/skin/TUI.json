@@ -3859,6 +3859,189 @@
  }
 },
 {
+ "key": "pm0",
+ "value": {
+  "version": 2,
+  "actions": [
+   {
+    "version": 1,
+    "onAction": "Mouse Down",
+    "handler": "Q-Link",
+    "handleName": "Data",
+    "additionalData": ""
+   }
+  ],
+  "backgroundData": {
+   "version": 1,
+   "focussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   },
+   "unfocussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   }
+  },
+  "ignoreMousePresses": false,
+  "disableCoarseDataWheel": false,
+  "componentsData": [
+   {
+    "version": 2,
+    "componentData": {
+     "version": 1,
+     "name": "button",
+     "type": "Button",
+     "data": {
+      "version": 2,
+      "onImage": "pm0_on.png",
+      "offImage": "pm0_off.png",
+      "buttonId": 0,
+      "numButtonsInGroup": 3,
+      "handleName": "Data",
+      "gestureBehaviour": "Instant"
+     }
+    },
+    "handle remapping": {
+     "version": 1,
+     "map": []
+    },
+    "bounds": {
+     "version": 1,
+     "acceptsHWFocus": "No",
+     "showWhenDataModelInvalid": "Show",
+     "whenVisible": "Always",
+     "boundsType": "Absolute",
+     "bounds": "0 0 96 44"
+    }
+   }
+  ]
+ }
+},
+{
+ "key": "pm1",
+ "value": {
+  "version": 2,
+  "actions": [
+   {
+    "version": 1,
+    "onAction": "Mouse Down",
+    "handler": "Q-Link",
+    "handleName": "Data",
+    "additionalData": ""
+   }
+  ],
+  "backgroundData": {
+   "version": 1,
+   "focussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   },
+   "unfocussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   }
+  },
+  "ignoreMousePresses": false,
+  "disableCoarseDataWheel": false,
+  "componentsData": [
+   {
+    "version": 2,
+    "componentData": {
+     "version": 1,
+     "name": "button",
+     "type": "Button",
+     "data": {
+      "version": 2,
+      "onImage": "pm1_on.png",
+      "offImage": "pm1_off.png",
+      "buttonId": 1,
+      "numButtonsInGroup": 3,
+      "handleName": "Data",
+      "gestureBehaviour": "Instant"
+     }
+    },
+    "handle remapping": {
+     "version": 1,
+     "map": []
+    },
+    "bounds": {
+     "version": 1,
+     "acceptsHWFocus": "No",
+     "showWhenDataModelInvalid": "Show",
+     "whenVisible": "Always",
+     "boundsType": "Absolute",
+     "bounds": "0 0 120 44"
+    }
+   }
+  ]
+ }
+},
+{
+ "key": "pm2",
+ "value": {
+  "version": 2,
+  "actions": [
+   {
+    "version": 1,
+    "onAction": "Mouse Down",
+    "handler": "Q-Link",
+    "handleName": "Data",
+    "additionalData": ""
+   }
+  ],
+  "backgroundData": {
+   "version": 1,
+   "focussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   },
+   "unfocussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   }
+  },
+  "ignoreMousePresses": false,
+  "disableCoarseDataWheel": false,
+  "componentsData": [
+   {
+    "version": 2,
+    "componentData": {
+     "version": 1,
+     "name": "button",
+     "type": "Button",
+     "data": {
+      "version": 2,
+      "onImage": "pm2_on.png",
+      "offImage": "pm2_off.png",
+      "buttonId": 2,
+      "numButtonsInGroup": 3,
+      "handleName": "Data",
+      "gestureBehaviour": "Instant"
+     }
+    },
+    "handle remapping": {
+     "version": 1,
+     "map": []
+    },
+    "bounds": {
+     "version": 1,
+     "acceptsHWFocus": "No",
+     "showWhenDataModelInvalid": "Show",
+     "whenVisible": "Always",
+     "boundsType": "Absolute",
+     "bounds": "0 0 104 44"
+    }
+   }
+  ]
+ }
+},
+{
  "key": "jm0",
  "value": {
   "version": 2,
@@ -7390,7 +7573,7 @@
      "showWhenDataModelInvalid": "Show",
      "whenVisible": "Always",
      "boundsType": "Absolute",
-     "bounds": "0 0 372 60"
+     "bounds": "0 0 372 54"
     }
    }
   ]
@@ -7573,7 +7756,190 @@
      "showWhenDataModelInvalid": "Show",
      "whenVisible": "Always",
      "boundsType": "Absolute",
-     "bounds": "0 0 372 60"
+     "bounds": "0 0 372 54"
+    }
+   }
+  ]
+ }
+},
+{
+ "key": "baddset",
+ "value": {
+  "version": 2,
+  "actions": [
+   {
+    "version": 1,
+    "onAction": "Mouse Down",
+    "handler": "Q-Link",
+    "handleName": "Data",
+    "additionalData": ""
+   }
+  ],
+  "backgroundData": {
+   "version": 1,
+   "focussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   },
+   "unfocussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   }
+  },
+  "ignoreMousePresses": false,
+  "disableCoarseDataWheel": false,
+  "componentsData": [
+   {
+    "version": 2,
+    "componentData": {
+     "version": 1,
+     "name": "button",
+     "type": "Button",
+     "data": {
+      "version": 2,
+      "onImage": "baddset_off.png",
+      "offImage": "baddset_off.png",
+      "buttonId": 1,
+      "numButtonsInGroup": 1,
+      "handleName": "Data",
+      "gestureBehaviour": "Instant"
+     }
+    },
+    "handle remapping": {
+     "version": 1,
+     "map": []
+    },
+    "bounds": {
+     "version": 1,
+     "acceptsHWFocus": "No",
+     "showWhenDataModelInvalid": "Show",
+     "whenVisible": "Always",
+     "boundsType": "Absolute",
+     "bounds": "0 0 180 64"
+    }
+   }
+  ]
+ }
+},
+{
+ "key": "bnext",
+ "value": {
+  "version": 2,
+  "actions": [
+   {
+    "version": 1,
+    "onAction": "Mouse Down",
+    "handler": "Q-Link",
+    "handleName": "Data",
+    "additionalData": ""
+   }
+  ],
+  "backgroundData": {
+   "version": 1,
+   "focussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   },
+   "unfocussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   }
+  },
+  "ignoreMousePresses": false,
+  "disableCoarseDataWheel": false,
+  "componentsData": [
+   {
+    "version": 2,
+    "componentData": {
+     "version": 1,
+     "name": "button",
+     "type": "Button",
+     "data": {
+      "version": 2,
+      "onImage": "bnext_off.png",
+      "offImage": "bnext_off.png",
+      "buttonId": 1,
+      "numButtonsInGroup": 1,
+      "handleName": "Data",
+      "gestureBehaviour": "Instant"
+     }
+    },
+    "handle remapping": {
+     "version": 1,
+     "map": []
+    },
+    "bounds": {
+     "version": 1,
+     "acceptsHWFocus": "No",
+     "showWhenDataModelInvalid": "Show",
+     "whenVisible": "Always",
+     "boundsType": "Absolute",
+     "bounds": "0 0 180 64"
+    }
+   }
+  ]
+ }
+},
+{
+ "key": "blearn",
+ "value": {
+  "version": 2,
+  "actions": [
+   {
+    "version": 1,
+    "onAction": "Mouse Down",
+    "handler": "Q-Link",
+    "handleName": "Data",
+    "additionalData": ""
+   }
+  ],
+  "backgroundData": {
+   "version": 1,
+   "focussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   },
+   "unfocussed": {
+    "version": 1,
+    "colour": "0",
+    "image": ""
+   }
+  },
+  "ignoreMousePresses": false,
+  "disableCoarseDataWheel": false,
+  "componentsData": [
+   {
+    "version": 2,
+    "componentData": {
+     "version": 1,
+     "name": "button",
+     "type": "Button",
+     "data": {
+      "version": 2,
+      "onImage": "blearn_off.png",
+      "offImage": "blearn_off.png",
+      "buttonId": 1,
+      "numButtonsInGroup": 1,
+      "handleName": "Data",
+      "gestureBehaviour": "Instant"
+     }
+    },
+    "handle remapping": {
+     "version": 1,
+     "map": []
+    },
+    "bounds": {
+     "version": 1,
+     "acceptsHWFocus": "No",
+     "showWhenDataModelInvalid": "Show",
+     "whenVisible": "Always",
+     "boundsType": "Absolute",
+     "bounds": "0 0 92 44"
     }
    }
   ]
@@ -9484,6 +9850,35 @@
   "value": [
    "Off",
    "On"
+  ]
+ },
+ {
+  "key": "Parameter 299",
+  "value": [
+   "Off",
+   "On"
+  ]
+ },
+ {
+  "key": "Parameter 300",
+  "value": [
+   "Off",
+   "On"
+  ]
+ },
+ {
+  "key": "Parameter 297",
+  "value": [
+   "Off",
+   "On"
+  ]
+ },
+ {
+  "key": "Parameter 296",
+  "value": [
+   "MPC Pads",
+   "Chromatic",
+   "Learned"
   ]
  }
 ],
@@ -22147,8 +22542,8 @@
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "c34",
-      "type": "padstart",
+      "name": "c296",
+      "type": "pm0",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -22159,7 +22554,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 34"
+        "value": "Parameter 296"
        }
       ]
      },
@@ -22169,7 +22564,136 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "666 486 164 40"
+      "bounds": "666 486 96 44"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "c296",
+      "type": "pm1",
+      "data": {
+       "version": 1,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 296"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "768 486 120 44"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "c296",
+      "type": "pm2",
+      "data": {
+       "version": 1,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 296"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "894 486 104 44"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "c297",
+      "type": "blearn",
+      "data": {
+       "version": 1,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 297"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "1002 486 92 44"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "v298",
+      "type": "Label",
+      "data": {
+       "version": 1,
+       "textStyle": {
+        "version": 1,
+        "font": {
+         "version": 1,
+         "name": "Roboto",
+         "style": "Bold",
+         "height": 17.0
+        },
+        "colour": "ffeceef2",
+        "justification": "horizontallyCentred verticallyCentred",
+        "case": "Original"
+       },
+       "type": "Value",
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 298"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "1104 488 154 40"
      }
     },
     {
@@ -22198,7 +22722,7 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "960 486 130 54"
+      "bounds": "666 564 130 54"
      }
     },
     {
@@ -22227,7 +22751,36 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1098 486 130 54"
+      "bounds": "804 564 130 54"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "c34",
+      "type": "padstart",
+      "data": {
+       "version": 1,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 34"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "960 568 164 40"
      }
     },
     {
@@ -23148,6 +23701,64 @@
      "version": 2,
      "componentData": {
       "version": 1,
+      "name": "c299",
+      "type": "baddset",
+      "data": {
+       "version": 1,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 299"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "892 264 180 64"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "c300",
+      "type": "bnext",
+      "data": {
+       "version": 1,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 300"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "1084 264 180 64"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
       "name": "c291",
       "type": "badd",
       "data": {
@@ -23170,7 +23781,7 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "892 268 372 60"
+      "bounds": "892 336 372 54"
      }
     },
     {
@@ -23199,7 +23810,7 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "892 340 180 60"
+      "bounds": "892 398 180 60"
      }
     },
     {
@@ -23228,7 +23839,7 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1084 340 180 60"
+      "bounds": "1084 398 180 60"
      }
     },
     {
@@ -23257,7 +23868,7 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "892 412 372 60"
+      "bounds": "892 466 372 54"
      }
     }
    ]

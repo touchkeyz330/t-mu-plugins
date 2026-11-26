@@ -98,7 +98,8 @@ enum : int
     kBrowseSel = kFxPad1 + 16, kBrowseRow, kBrowsePath, kBrowseLine1,
     kBrowseOpen = kBrowseLine1 + 8, kBrowseBack, kBrowseLoadA, kBrowseLoadB, kBrowseAdd, kBrowsePgUp, kBrowsePgDn, kBrowseDrives,
     kJogMode,
-    kNumParams
+    kPadMap, kPadLearn, kPadInfo, kAddSet, kLoadNext, kLearn1,
+    kNumParams = kLearn1 + 16
 };
 // FX pads (bottom row first)
 enum { PF_LP, PF_HP, PF_CENSOR, PF_SPIN, PF_GATE2, PF_GATE4, PF_FLANGE, PF_CRUSH,
@@ -108,6 +109,10 @@ const char* kPadFxName[16] = { "LP SWEEP", "HP SWEEP", "CENSOR", "BACKSPIN", "GA
 constexpr int kMaxTracks = 8192;
 inline int dp(int deck, int o) { return (deck ? (int)kBPlay : (int)kAPlay) + o; }
 const float kSizeBeats[] = { 0.125f, 0.25f, 0.5f, 1, 2, 4, 8, 16, 32 };
+// the notes MPC pads send in a standard MPC program (Pad Bank A and B, pads 1-16)
+const int kMpcBankA[16] = { 37, 36, 42, 82, 40, 38, 46, 44, 48, 47, 45, 43, 49, 55, 51, 53 };
+const int kMpcBankB[16] = { 54, 69, 81, 80, 65, 66, 76, 77, 56, 62, 63, 64, 73, 74, 71, 39 };
+const char* const kSetList = "SET LIST";
 const char* kSizeText[] = { "1/8", "1/4", "1/2", "1", "2", "4", "8", "16", "32" };
 
 const float kLoopBeats[] = { 1, 2, 4, 8, 16, 32, 64 };
@@ -448,6 +453,17 @@ public:
             addParam(mpc::boolParam(id.c_str(), n, false));
         }
         addParam(mpc::choiceParam("jogmode", "Jog Mode", { "Nudge", "Scratch" }, 1));
+        addParam(mpc::choiceParam("padmap", "Pad Map", { "MPC Pads", "Chromatic", "Learned" }, 0));
+        addParam(mpc::boolParam("padlearn", "Pad Learn", false));
+        addParam(mpc::intParam("padinfo", "Pad Info", 0, 1000, 0));
+        addParam(mpc::boolParam("addset", "Add To Set", false));
+        addParam(mpc::boolParam("loadnext", "Load Next", false));
+        for (int k = 0; k < 16; ++k)
+        {
+            char id[16], nm[24];
+            std::snprintf(id, sizeof id, "learn%d", k + 1); std::snprintf(nm, sizeof nm, "Pad %d Note", k + 1);
+            addParam(mpc::intParam(id, nm, 0, 127, kMpcBankA[k]));
+        }
         notify_.reset(new std::atomic<uint8_t>[kNumParams]);
         for (int i = 0; i < kNumParams; ++i) notify_[i].store(0);
         lastSeen_.assign(kNumParams, 0.0f);
@@ -489,6 +505,8 @@ public:
                 return true;
             }
             case kLibInfo: out = libraryText(); return true;
+            case kPadInfo: out = padInfoText(); return true;
+            case kPadLearn: case kAddSet: case kLoadNext: out = "TAP"; return true;
             case kRescan: out = "TAP"; return true;
             case kATempo: case kBTempo:
             {
@@ -698,7 +716,8 @@ private:
                 const TrackInfo &x = tracks_[(size_t)a], &y = tracks_[(size_t)b];
                 return (x.analyzed ? x.bpm : 999.0f) < (y.analyzed ? y.bpm : 999.0f); });
             std::stable_sort(byKey.begin(), byKey.end(), [&](int a, int b) { return camelot(a) < camelot(b); });
-            v->order.push_back({ c.tracks, byBpm, byKey });
+            if (c.name == kSetList) v->order.push_back({ c.tracks, c.tracks, c.tracks });     // a set keeps your order
+            else v->order.push_back({ c.tracks, byBpm, byKey });
         }
         view_.store(v.get(), std::memory_order_release);
         views_.push_back(std::move(v));
@@ -812,6 +831,19 @@ private:
             buildView();
             selCrate_ = "Browsed Songs"; selTrack_.store(t); selDeck_.store(deck);
         }
+        else if (type == 3 && idx >= 0 && idx < (int)L->items.size())
+        {   // ADD TO SET: append one song to the SET LIST crate, in the order you add them
+            const int t = addFile(L->items[(size_t)idx].path);
+            if (t < 0) { say("CAN'T READ THAT SONG"); return; }
+            Crate* set = nullptr;
+            for (auto& c : addedCrates_) if (c.name == kSetList) set = &c;
+            if (!set) { addedCrates_.insert(addedCrates_.begin(), Crate{ kSetList, {} }); set = &addedCrates_.front(); }
+            if (std::find(set->tracks.begin(), set->tracks.end(), t) != set->tracks.end()) { say("ALREADY IN THE SET"); return; }
+            set->tracks.push_back(t);
+            buildView();
+            char b[64]; std::snprintf(b, sizeof b, "ADDED TO SET  (%d SONGS)", (int)set->tracks.size());
+            say(b);
+        }
         else if (type == 2)
         {
             std::vector<mdlib::FileEntry> files;
@@ -902,11 +934,25 @@ private:
                     const mdlib::BrowseList* L = bReqList_.load();
                     const int idx = bReqIdx_.load();
                     if (t == 1 || !L) publishList(new mdlib::BrowseList(mdlib::listDrives(mpc::pluginFolder())));
-                    else if (t == 2 && idx >= 0 && idx < (int)L->items.size()) publishList(new mdlib::BrowseList(mdlib::listFolder(L->items[(size_t)idx].path)));
+                    else if (t == 2 && idx >= 0 && idx < (int)L->items.size())
+                    {
+                        const std::string& ip = L->items[(size_t)idx].path;
+                        const size_t pl = std::strlen(mdlib::kAllPrefix);
+                        if (ip.rfind(mdlib::kAllPrefix, 0) == 0)
+                        {
+                            say("FINDING EVERY SONG...");
+                            mdlib::BrowseList* all = new mdlib::BrowseList(mdlib::listAll(ip.substr(pl)));
+                            char b[64]; std::snprintf(b, sizeof b, "%d SONGS", (int)all->items.size());
+                            publishList(all); say(b);
+                        }
+                        else publishList(new mdlib::BrowseList(mdlib::listFolder(ip)));
+                    }
                     else if (t == 3)
                     {
                         // up one folder; from a drive's top level, back to the drive list
-                        const std::string p = L->path;
+                        std::string p = L->path;
+                        const size_t pl = std::strlen(mdlib::kAllPrefix);
+                        if (p.rfind(mdlib::kAllPrefix, 0) == 0) { publishList(new mdlib::BrowseList(mdlib::listFolder(p.substr(pl)))); bReq_.store(0); continue; }
                         const size_t sl = p.find_last_of('/');
                         bool atDrive = L->drives || p.empty();
                         if (!atDrive)
@@ -918,6 +964,20 @@ private:
                         else publishList(new mdlib::BrowseList(mdlib::listFolder(p.substr(0, sl))));
                     }
                     bReq_.store(0);
+                }
+                // a drive plugged in or pulled out: refresh the drive list and look for music on it
+                if (++driveTick_ >= 100)
+                {
+                    driveTick_ = 0;
+                    const std::string sig = mdlib::driveSignature();
+                    if (!driveSig_.empty() && sig != driveSig_)
+                    {
+                        say(sig.size() > driveSig_.size() ? "DRIVE CONNECTED" : "DRIVE REMOVED");
+                        const mdlib::BrowseList* cur = blist_.load();
+                        if (!cur || cur->drives) publishList(new mdlib::BrowseList(mdlib::listDrives(mpc::pluginFolder())));
+                        rescan_.store(true);
+                    }
+                    driveSig_ = sig;
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(15));
             }
@@ -996,7 +1056,7 @@ private:
         if (scanning_.load()) return "SCANNING DRIVE...";
         const int ff = foldersFound_.load();
         if (ff < 0) return "STARTING...";
-        if (ff == 0) return "NO 'Melt Deck Music' FOLDER";
+        if (ff == 0) return "LOAD SONGS FROM BROWSE";
         int total = 0, ready = 0;
         const int n = nTracks();
         for (int i = 0; i < n; ++i)
@@ -1049,6 +1109,7 @@ private:
             return o <= oHot3 || o == oJog || o == oLoopSize;
         }
         if (i == kRescan || (i >= kFxPad1 && i < kFxPad1 + 16)) return true;
+        if (i == kPadLearn || i == kAddSet || i == kLoadNext) return true;
         if (i == kBrowseSel || i == kBrowseRow || (i >= kBrowseOpen && i <= kBrowseDrives)) return true;
         return i >= kBpmUp && i <= kNudgeUp ? true : i == kSamplerPlay;
     }
@@ -1141,6 +1202,21 @@ private:
             case kBrowsePgUp: bsel_ = std::max(0, bsel_ - 8); break;
             case kBrowsePgDn: bsel_ += 8; break;
             case kBrowseDrives: postBrowse(1, -1); break;
+            case kPadLearn:
+                learnStep_ = learnStep_ >= 0 ? -1 : 0;           // tap again to stop
+                padInfoDirty_ = true;
+                break;
+            case kAddSet:
+            {
+                const mdlib::BrowseList* L = blist_.load();
+                if (L && bsel_ >= 0 && bsel_ < (int)L->items.size())
+                {
+                    if (!L->items[(size_t)bsel_].dir) postAdd(3, bsel_, -1);
+                    else if (L->items[(size_t)bsel_].path.rfind(mdlib::kAllPrefix, 0) != 0) say("OPEN THE FOLDER, THEN ADD SONGS");
+                }
+                break;
+            }
+            case kLoadNext: loadNext(); break;
             case kBrowseBack: postBrowse(3, -1); break;
             case kBrowseOpen:
             {
@@ -1196,6 +1272,10 @@ private:
     }
     std::string browsePathText() const
     {
+        {
+            std::lock_guard<std::mutex> g(msgMu_);
+            if (msgOn_.load() && !msg_.empty()) return msg_;
+        }
         const mdlib::BrowseList* L = blist_.load();
         if (!L) return "Looking for drives...";
         char b[64];
@@ -1205,6 +1285,64 @@ private:
         if (t.size() > 20) t = t.substr(0, 20);
         return t + b;
     }
+    // a short message on the BROWSE page (any thread)
+    void say(const std::string& m)
+    {
+        { std::lock_guard<std::mutex> g(msgMu_); msg_ = m; }
+        msgUntil_.store(msgClock_.load() + 3.0);           // shown for 3 seconds
+        msgOn_.store(true);
+        msgSerial_.fetch_add(1);
+    }
+    // which MPC pad (0-31) a note comes from, under the PAD MAP setting
+    int padOf(int note) const
+    {
+        const int map = getInt(kPadMap);
+        if (map == 1) { const int r = note - getInt(kPadStart); return (r >= 0 && r < 32) ? r : -1; }
+        for (int k = 0; k < 16; ++k) if ((map == 2 ? getInt(kLearn1 + k) : kMpcBankA[k]) == note) return k;
+        for (int k = 0; k < 16; ++k) if (kMpcBankB[k] == note) return 16 + k;
+        return -1;
+    }
+    std::string padInfoText() const
+    {
+        char b[48];
+        if (learnStep_ >= 0) { std::snprintf(b, sizeof b, "HIT PAD %d", learnStep_ + 1); return b; }
+        switch (getInt(kPadMap))
+        {
+            case 1: return "CHROMATIC";
+            case 2: return "LEARNED";
+            default: return "MPC PADS";
+        }
+    }
+    // LOAD NEXT: the next song in the SET LIST goes on the deck that isn't playing
+    void loadNext()
+    {
+        const View* v = view();
+        int c = -1;
+        if (v) for (size_t k = 0; k < v->crates.size(); ++k) if (v->crates[k].name == kSetList) c = (int)k;
+        if (c < 0 || v->crates[(size_t)c].tracks.empty()) { say("SET LIST IS EMPTY - ADD SONGS IN BROWSE"); return; }
+        const auto& o = v->order[(size_t)c][0];
+        int target;
+        if (!twoDecks_) target = 0;
+        else if (deck_[0].playing && !deck_[1].playing) target = 1;
+        else if (deck_[1].playing && !deck_[0].playing) target = 0;
+        else if (!deck_[0].playing && !deck_[1].playing) target = deck_[0].live ? 1 : 0;
+        else { say("BOTH DECKS ARE PLAYING"); return; }
+        if (deck_[target].playing) { say("STOP THE DECK FIRST"); return; }
+        // after whatever the other deck is playing, else after the last one loaded
+        int after = setPos_;
+        const Deck& other = deck_[1 - target];
+        const int ot = twoDecks_ && other.live ? other.live->track : -1;
+        for (size_t k = 0; k < o.size(); ++k) if (o[k] == ot) after = (int)k;
+        const int next = after + 1;
+        if (next >= (int)o.size()) { say("END OF THE SET LIST"); return; }
+        writePlain(target ? kBCrate : kACrate, (float)c);
+        writePlain(target ? kBTrack : kATrack, (float)(next + 1));
+        setPos_ = next;
+        std::string nm = tracks_[(size_t)o[(size_t)next]].name;
+        if (nm.size() > 18) nm = nm.substr(0, 18);
+        say(std::string(target ? "DECK B: " : "DECK A: ") + nm);
+    }
+
     // audio thread: point a deck at a song the loader just added
     void applySelection()
     {
@@ -1330,7 +1468,18 @@ private:
         if (stt == 0xA0 || stt == 0xD0) { padPressure(stt == 0xA0 ? e.data[2] : e.data[1]); return; }   // pad pressure
         const bool on = e.isNoteOn(), off = e.isNoteOff();
         if (!on && !off) return;
-        const int rel = e.note() - getInt(kPadStart);
+        if (learnStep_ >= 0)
+        {   // LEARN: the next 16 pads hit, in order, become pads 1-16
+            if (on)
+            {
+                for (int k = 0; k < learnStep_; ++k) if (getInt(kLearn1 + k) == e.note()) return;   // same pad twice: ignore
+                writePlain(kLearn1 + learnStep_, (float)e.note());
+                if (++learnStep_ >= 16) { learnStep_ = -1; writePlain(kPadMap, 2.0f); }
+                padInfoDirty_ = true;
+            }
+            return;
+        }
+        const int rel = padOf(e.note());
         // FX pads: Pad Bank B always, or Bank A while PAD MODE is FX
         if ((rel >= 16 && rel < 32) || (rel >= 0 && rel < 16 && getInt(kPadMode) == 1))
         {
@@ -1875,12 +2024,15 @@ private:
             const long sig = (long)serial * 100000L + page * 8 + k;
             if (sig != bLineSig_[k]) { bLineSig_[k] = sig; bLineCount_[k] = (bLineCount_[k] + 1) % 1000; writePlain(kBrowseLine1 + k, (float)bLineCount_[k]); }
         }
-        const long ps = (long)serial * 100000L + bsel_;
+        if (msgOn_.load() && msgClock_.load() > msgUntil_.load()) { msgOn_.store(false); msgSerial_.fetch_add(1); }
+        if (padInfoDirty_) { padInfoDirty_ = false; padInfoCount_ = (padInfoCount_ + 1) % 1000; writePlain(kPadInfo, (float)padInfoCount_); }
+        const long ps = (long)serial * 100000L + bsel_ + (long)msgSerial_.load() * 7919L;
         if (ps != bPathSig_) { bPathSig_ = ps; bPathCount_ = (bPathCount_ + 1) % 1000; writePlain(kBrowsePath, (float)bPathCount_); }
     }
     void publish(int n)
     {
         const float dt = (float)n / sr_;
+        msgClock_.store(msgClock_.load() + dt);
         if (guard_ > 0) return;              // just after a project/state load: leave the restored values alone
         publishBrowser();
         for (int i = 0; i < 2; ++i)
@@ -2015,6 +2167,14 @@ private:
     std::map<std::string, mdlib::CacheLine> browseCache_;
     bool browseCacheLoaded_ = false;
     std::vector<int> browsed_;
+    mutable std::mutex msgMu_;
+    std::string msg_;
+    std::atomic<double> msgClock_{0.0}, msgUntil_{0.0};
+    std::atomic<bool> msgOn_{false};
+    int learnStep_ = -1, setPos_ = -1, padInfoCount_ = 0, driveTick_ = 0;
+    bool padInfoDirty_ = true;
+    std::atomic<int> msgSerial_{0};
+    std::string driveSig_;
     std::vector<Crate> addedCrates_;
     std::thread browser_;
     std::atomic<mdlib::BrowseList*> blist_{nullptr}, bReqList_{nullptr}, bAddList_{nullptr};

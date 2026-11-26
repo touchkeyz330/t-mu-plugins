@@ -2,8 +2,12 @@
 //
 // SPDX-License-Identifier: MIT
 //
-// CAPTURE   arms the plugin. The next word that comes through the track is recorded on its own:
-//           it starts when the sound starts and stops when the word ends (or press CAPTURE again).
+// CAPTURE   arms the plugin. CAPTURE length WORD: the next word is recorded on its own (it
+//           starts when the sound starts and stops when the word ends; press again to stop).
+//           1 BEAT .. 2 BARS: records exactly that long, starting on the next beat while the
+//           sequencer plays (or on the first sound when it's stopped).
+// GRAB      takes what just went past: the plugin always keeps the last 10 seconds. WORD grabs
+//           the last word; the beat lengths grab exactly that much, ending on the last beat.
 // PLAY WORD plays the captured word as it is.
 // STUTTER   plays the stutter: the start of the word repeated (REPEATS x RATE, timed to the MPC
 //           tempo), then the whole word. FADE IN ramps the repeats up, PAN throws them left and
@@ -15,6 +19,11 @@
 //
 // The stutter is rendered on a worker thread whenever a setting or the tempo changes, so the
 // audio thread only plays back a finished buffer.
+//
+// MPC notes: the host nudges parameter 0 on every prepare, so parameter 0 is the status line
+// (display only). Every button is momentary (pressed = 1, released = 0) and acts on the press;
+// the plugin never writes its own buttons. Screen feedback (status, lights, waveform) is
+// published from the worker thread, so it updates even while the MPC isn't sending audio.
 
 #include "mpc_plugin.h"
 #include "dsp/biquad.h"
@@ -74,17 +83,19 @@ using mpc::dsp::BiquadCoeffs;
 
 enum
 {
-    kCapture = 0, kPlayWord, kStutter, kSave,
+    kStatus = 0,                                   // parameter 0: display only (the MPC nudges it)
+    kCapture, kGrab, kPlayWord, kStutter, kSave,
     kRepeats, kRate, kFade, kPan, kOutput, kPitch, kGate,
     kChoOn, kChoDepth, kChoMix, kPhoOn, kPhoTone, kPhoMix, kBvOn, kBvSize, kBvMix,
-    kAuto, kMode, kSens,
-    kStatus, kBpm, kSig, kPlayhead, kSlice, kWave1,
+    kAuto, kMode, kSens, kCapLen,
+    kBpm, kSig, kPlayhead, kSlice, kInMeter, kCapLight, kPlayLight, kWave1,
     kNumParams = kWave1 + 48
 };
 constexpr int kCols = 48;
 const int kRepeatsV[] = { 2, 3, 4, 6, 8, 12, 16 };
 const double kRateBeats[] = { 1.0, 0.5, 1.0 / 3.0, 0.25, 1.0 / 6.0, 0.125 };
 const int kAutoBars[] = { 0, 1, 2, 4 };
+const double kCapBeats[] = { 0, 1, 2, -1, -2 };     // 0 = word, >0 beats, <0 bars
 
 struct Segment { long outStart, outLen; double src, step; };
 
@@ -93,6 +104,7 @@ struct Render
 {
     std::vector<float> st[2], word[2];
     long stLen = 0, wordLen = 0, preroll = 0;
+    int gen = 0;                       // which captured word this was made from
     std::vector<Segment> segs;
 };
 
@@ -138,7 +150,9 @@ class MeltStutter : public mpc::Plugin
 public:
     MeltStutter() : mpc::Plugin(makeInfo())
     {
+        addParam(mpc::intParam("status", "Status", 0, 1000, 0));
         addParam(mpc::boolParam("capture", "Capture", false));
+        addParam(mpc::boolParam("grab", "Grab", false));
         addParam(mpc::boolParam("playword", "Play Word", false));
         addParam(mpc::boolParam("stutter", "Stutter", false));
         addParam(mpc::boolParam("save", "Save WAV", false));
@@ -160,12 +174,15 @@ public:
         addParam(mpc::floatParam("bvmix", "Backverb Mix", 0.0f, 100.0f, 60.0f, "%", 0));
         addParam(mpc::choiceParam("auto", "Auto", { "Off", "Every Bar", "Every 2 Bars", "Every 4 Bars" }, 0));
         addParam(mpc::choiceParam("mode", "Mode", { "Over", "Replace" }, 0));
-        addParam(mpc::floatParam("sens", "Threshold", -60.0f, -20.0f, -42.0f, "dB", 0));
-        addParam(mpc::intParam("status", "Status", 0, 1000, 0));
+        addParam(mpc::floatParam("sens", "Threshold", -60.0f, -20.0f, -45.0f, "dB", 0));
+        addParam(mpc::choiceParam("caplen", "Capture", { "Word", "1 Beat", "2 Beats", "1 Bar", "2 Bars" }, 0));
         addParam(mpc::floatParam("bpm", "BPM", 0.0f, 300.0f, 120.0f, "", 1));
         addParam(mpc::intParam("sig", "Time Sig", 0, 1999, 404));
         addParam(mpc::floatParam("playhead", "Playhead", 0.0f, 1.0f, 0.0f, "", 2));
         addParam(mpc::floatParam("slice", "Slice", 0.0f, 1.0f, 0.0f, "", 2));
+        addParam(mpc::floatParam("inmeter", "In Meter", 0.0f, 1.0f, 0.0f, "", 2));
+        addParam(mpc::intParam("caplight", "Cap Light", 0, 2, 0));
+        addParam(mpc::intParam("playlight", "Play Light", 0, 2, 0));
         for (int k = 0; k < kCols; ++k)
         {
             char id[16], nm[16];
@@ -218,7 +235,7 @@ public:
             case kOutput: case kSens: std::snprintf(b, sizeof b, "%+.1f dB", plain); out = b; return true;
             case kFade: case kPan: case kGate: case kChoDepth: case kChoMix: case kPhoTone: case kPhoMix: case kBvSize: case kBvMix:
                 std::snprintf(b, sizeof b, "%d%%", (int)std::lround(plain)); out = b; return true;
-            case kPlayhead: case kSlice: out = ""; return true;
+            case kPlayhead: case kSlice: case kInMeter: case kCapLight: case kPlayLight: out = ""; return true;
             default:
                 if (index >= kWave1) { out = ""; return true; }
                 return false;
@@ -227,20 +244,25 @@ public:
 
     void prepare(double sr, int) override
     {
+        if (running_.exchange(false) && worker_.joinable()) worker_.join();   // prepare can repeat: stop the worker first
         sr_ = (float)sr;
+        ringN_ = (long)(sr * 10.0);                                            // the last 10 seconds, always
+        ring_[0].assign((size_t)ringN_, 0.0f); ring_[1].assign((size_t)ringN_, 0.0f);
         capMax_ = (long)(sr * 8.0);
-        cap_[0].assign((size_t)capMax_, 0.0f); cap_[1].assign((size_t)capMax_, 0.0f);
         preN_ = (long)(sr * 0.04);
-        pre_[0].assign((size_t)preN_, 0.0f); pre_[1].assign((size_t)preN_, 0.0f);
-        lastCapture_ = getBool(kCapture); lastPlayWord_ = getBool(kPlayWord); lastStutter_ = getBool(kStutter); lastSave_ = getBool(kSave);
-        if (!running_.exchange(true)) worker_ = std::thread([this] { workerLoop(); });
+        total_ = 0;
+        for (int i = kCapture; i <= kSave; ++i) last_[i] = getBool(i);
+        capState_.store(word_ ? kReady : kIdle);
+        running_.store(true);
+        worker_ = std::thread([this] { workerLoop(); });
         needRender_.store(true);
     }
 
     void reset() override
     {
-        playing_ = 0; playPos_ = 0; env_ = 0; duck_ = 1;
-        capState_.store(capState_.load() == kRec ? kIdle : capState_.load());
+        playing_.store(0); playPos_ = 0; env_ = 0; duck_ = 1; pendingPlay_ = 0;
+        const int st = capState_.load();
+        if (st == kArmed || st == kWaitBeat || st == kRec) capState_.store(word_ ? kReady : kIdle);
     }
 
     void process(mpc::ProcessContext& ctx) override
@@ -251,6 +273,8 @@ public:
         hostBpm_.store(bpm);
         const bool seq = tr.valid && tr.playing && tr.ppqValid;
         const int num = tr.valid ? std::max(1, tr.timeSigNumerator) : 4, den = tr.valid ? std::max(1, tr.timeSigDenominator) : 4;
+        sig_.store(mpc::clamp(num, 1, 19) * 100 + mpc::clamp(den, 1, 99));
+        const double spq = 60.0 / bpm * sr_;                                  // samples per beat
 
         // swap in a fresh render (lock-free: the worker deletes the old one)
         if (Render* p = pending_.load(std::memory_order_acquire))
@@ -261,21 +285,52 @@ public:
                 cur_ = p;
             }
 
-        // buttons
-        const bool cap = getBool(kCapture), pw = getBool(kPlayWord), stt = getBool(kStutter), sv = getBool(kSave);
-        if (cap != lastCapture_)
+        // buttons: act on the press only
+        bool down[kSave + 1] = {};
+        for (int i = kCapture; i <= kSave; ++i)
         {
-            lastCapture_ = cap;
+            const bool v = getBool(i);
+            down[i] = v && !last_[i];
+            last_[i] = v;
+        }
+        const double capBeatsSet = kCapBeats[mpc::clamp(getInt(kCapLen), 0, 4)];
+        const double capBeats = capBeatsSet < 0 ? -capBeatsSet * num * 4.0 / den : capBeatsSet;
+        if (down[kCapture])
+        {
             const int st = capState_.load();
-            if (cap && (st == kIdle || st == kReady)) { capState_.store(kArmed); capLen_ = 0; }
-            else if (!cap && st == kArmed) capState_.store(word_ ? kReady : kIdle);
-            else if (!cap && st == kRec) finishCapture();
+            if (st == kArmed || st == kWaitBeat) capState_.store(word_ ? kReady : kIdle);   // press again: cancel
+            else if (st == kRec) finishCapture();                                            // press again: stop now
+            else if (st != kDone)
+            {
+                capFixed_ = capBeats > 0 ? (long)(capBeats * spq) : 0;
+                capState_.store(capFixed_ && seq ? kWaitBeat : kArmed);
+            }
             bump();
         }
-        if (pw && !lastPlayWord_ && cur_ && cur_->wordLen) { playing_ = 1; playPos_ = 0; bump(); }
-        if (stt && !lastStutter_ && cur_ && cur_->stLen) { playing_ = 2; playPos_ = 0; bump(); }
-        if (sv && !lastSave_) saveReq_.store(true);
-        lastPlayWord_ = pw; lastStutter_ = stt; lastSave_ = sv;
+        if (down[kGrab] && capState_.load() != kDone && capState_.load() != kRec)
+        {
+            // what just went past: WORD = the last sound in the last 3 s; beats = exactly that, ending on the last beat
+            long end = 0, len;
+            if (capBeats > 0)
+            {
+                len = std::min(capMax_, (long)(capBeats * spq));
+                if (seq) end = (long)((tr.ppqPos - std::floor(tr.ppqPos)) * spq);
+            }
+            else len = std::min(capMax_, (long)(3.0f * sr_));
+            capStart_ = total_ - end - len;
+            capLen_ = len;
+            if (capStart_ < 0) { capLen_ += capStart_; capStart_ = 0; }
+            capWord_ = capBeats <= 0; capTrim_ = capBeats <= 0;
+            capState_.store(capLen_ > 0 ? kDone : capState_.load());
+            bump();
+        }
+        if (down[kPlayWord]) { pendingPlay_ = 1; bump(); }
+        if (down[kStutter]) { pendingPlay_ = 2; bump(); }
+        if (down[kSave]) saveReq_.store(true);
+        // play as soon as the sound is ready (right after a capture the stutter is still being made)
+        if (pendingPlay_ && !word_ && capState_.load() != kDone) pendingPlay_ = 0;     // nothing captured yet
+        if (pendingPlay_ && cur_ && cur_->gen == wordGen_.load() && (pendingPlay_ == 1 ? cur_->wordLen : cur_->stLen) > 0)
+        { playing_.store(pendingPlay_); playPos_ = 0; pendingPlay_ = 0; bump(); }
 
         // AUTO: start so the stutter (after any backverb swell) lands on the downbeat
         long autoStart = -1;
@@ -283,13 +338,24 @@ public:
         if (bars && seq && cur_ && cur_->stLen)
         {
             const double period = bars * num * 4.0 / den;
-            const double spq = 60.0 / bpm * sr_;
             const double pre = cur_->preroll / spq;
             const double p0 = tr.ppqPos, p1 = p0 + n / spq;
             const double next = std::ceil((p0 + pre - 1e-9) / period) * period - pre;
             if (next >= p0 && next < p1 && std::fabs(next - lastAuto_) > 1e-6)
             {
                 autoStart = (long)((next - p0) * spq); lastAuto_ = next;
+            }
+        }
+        // CAPTURE on the beat: where in this block the next beat falls
+        long beatAt = -1;
+        if (capState_.load() == kWaitBeat)
+        {
+            if (!seq) capState_.store(kArmed);
+            else
+            {
+                const double nb = std::ceil(tr.ppqPos - 1e-9);
+                const long off = (long)((nb - tr.ppqPos) * spq);
+                if (off < n) beatAt = std::max(0L, off);
             }
         }
 
@@ -302,69 +368,70 @@ public:
         float* outL = ctx.outputs[0];
         float* outR = ctx.numOutputs > 1 ? ctx.outputs[1] : ctx.outputs[0];
         const Render* r = cur_;
+        float pk = 0;
         for (int i = 0; i < n; ++i)
         {
             const float l = inL[i], rr = inR[i];
-            if (i == autoStart) { playing_ = 2; playPos_ = 0; bump(); }
-            // capture
+            if (i == autoStart && r) { playing_.store(2); playPos_ = 0; bump(); }
             const float a = std::max(std::fabs(l), std::fabs(rr));
+            pk = std::max(pk, a);
             env_ = a > env_ ? a : env_ + (a - env_) * aRel;
+            // every input sample goes into the 10 second memory
+            const long w = (long)(total_ % ringN_);
+            ring_[0][(size_t)w] = l; ring_[1][(size_t)w] = rr;
             const int st = capState_.load(std::memory_order_relaxed);
-            if (st == kArmed && env_ > thr)
+            if (st == kWaitBeat && i == beatAt)
             {
-                // keep the 40 ms just before the word, so the attack isn't cut
-                for (long k = 0; k < preN_; ++k)
-                {
-                    const long j = (preW_ + k) % preN_;
-                    cap_[0][(size_t)k] = pre_[0][(size_t)j]; cap_[1][(size_t)k] = pre_[1][(size_t)j];
-                }
-                capLen_ = preN_; quiet_ = 0; capState_.store(kRec); bump();
+                capStart_ = total_; capLen_ = 0; capWord_ = false; capTrim_ = false; capState_.store(kRec); bump();
             }
-            else if (st == kRec)
+            else if (st == kArmed && env_ > thr)
             {
-                cap_[0][(size_t)capLen_] = l; cap_[1][(size_t)capLen_] = rr; ++capLen_;
+                // start 40 ms early so the attack isn't cut
+                capStart_ = std::max(0LL, total_ - preN_); capLen_ = (long)(total_ - capStart_);
+                capWord_ = capFixed_ == 0; capTrim_ = capFixed_ == 0;
+                quiet_ = 0; capState_.store(kRec); bump();
+            }
+            if (capState_.load(std::memory_order_relaxed) == kRec)
+            {
+                ++capLen_;
                 quiet_ = env_ < thr ? quiet_ + 1 : 0;
-                if ((quiet_ > (long)(0.28f * sr_) && capLen_ > (long)(0.12f * sr_)) || capLen_ >= capMax_) finishCapture();
+                const bool wordEnd = capWord_ && quiet_ > (long)(0.3f * sr_) && capLen_ > (long)(0.12f * sr_);
+                const bool full = capFixed_ ? capLen_ >= capFixed_ + (capTrim_ ? preN_ : 0) : capLen_ >= capMax_;
+                if (wordEnd || full || capLen_ >= capMax_) finishCapture();
             }
-            pre_[0][(size_t)preW_] = l; pre_[1][(size_t)preW_] = rr; preW_ = (preW_ + 1) % preN_;
+            ++total_;
 
             // playback
             float pl = 0, pr = 0;
-            if (playing_ && r)
+            const int pm = playing_.load(std::memory_order_relaxed);
+            if (pm && r)
             {
-                const std::vector<float>* b = playing_ == 1 ? r->word : r->st;
-                const long len = playing_ == 1 ? r->wordLen : r->stLen;
+                const std::vector<float>* b = pm == 1 ? r->word : r->st;
+                const long len = pm == 1 ? r->wordLen : r->stLen;
                 if (playPos_ < len) { pl = b[0][(size_t)playPos_]; pr = b[1][(size_t)playPos_]; ++playPos_; }
-                else { playing_ = 0; bump(); }
+                else { playing_.store(0); bump(); }
             }
-            const float dt = (replace && playing_) ? 0.0f : 1.0f;
+            const float dt = (replace && pm) ? 0.0f : 1.0f;
             duck_ += (dt - duck_) * 0.003f;
             outL[i] = softClip(l * duck_ + pl * outG);
             outR[i] = softClip(rr * duck_ + pr * outG);
         }
-
-        // displays
-        timer_ += (float)n / sr_;
-        if (timer_ >= 1.0f / 25.0f)
+        inPeak_.store(std::max(inPeak_.load(std::memory_order_relaxed), pk), std::memory_order_relaxed);
+        // playhead
+        float ph = 0;
+        const int pm = playing_.load();
+        if (pm && r && r->wordLen)
         {
-            timer_ = 0;
-            writeParam(kBpm, bpm / 300.0f);
-            writeParam(kSig, (float)(mpc::clamp(num, 1, 19) * 100 + mpc::clamp(den, 1, 99)) / 1999.0f);
-            float ph = 0;
-            if (playing_ && r && r->wordLen)
-            {
-                if (playing_ == 1) ph = (float)playPos_ / r->wordLen;
-                else for (const Segment& s : r->segs)
-                    if (playPos_ >= s.outStart && playPos_ < s.outStart + s.outLen)
-                    { ph = (float)((s.src + (playPos_ - s.outStart) * s.step) / r->wordLen); break; }
-            }
-            writeParam(kPlayhead, std::round(mpc::clamp(ph, 0.0f, 1.0f) * 63.0f) / 63.0f);
-            if (statusDirty_.exchange(false)) { statusCount_ = (statusCount_ + 1) % 1000; writeParam(kStatus, statusCount_ / 1000.0f); }
+            if (pm == 1) ph = (float)playPos_ / r->wordLen;
+            else for (const Segment& sg : r->segs)
+                if (playPos_ >= sg.outStart && playPos_ < sg.outStart + sg.outLen)
+                { ph = (float)((sg.src + (playPos_ - sg.outStart) * sg.step) / r->wordLen); break; }
         }
+        playhead_.store(ph);
     }
 
 private:
-    enum { kIdle, kArmed, kRec, kDone, kReady };
+    enum { kIdle, kArmed, kWaitBeat, kRec, kDone, kReady };
 
     static inline float softClip(float x)
     {
@@ -374,12 +441,7 @@ private:
         return x < 0 ? -y : y;
     }
     void bump() { statusDirty_.store(true); }
-    void finishCapture()
-    {
-        capState_.store(kDone);
-        setNormalised(kCapture, 0.0f); lastCapture_ = false; notify_[kCapture].store(1);
-        bump();
-    }
+    void finishCapture() { capState_.store(kDone); bump(); }
     void writeParam(int i, float v)
     {
         v = mpc::clamp(v, 0.0f, 1.0f);
@@ -393,17 +455,20 @@ private:
         char b[48];
         switch (capState_.load())
         {
-            case kArmed: return "LISTENING... SING OR PLAY IT";
-            case kRec: return "RECORDING WORD";
-            case kDone: return "CAPTURED";
+            case kArmed: return "LISTENING - PLAY THE VOCAL";
+            case kWaitBeat: return "RECORDS ON THE NEXT BEAT";
+            case kRec: return "RECORDING...";
+            case kDone: return "GOT IT";
             default: break;
         }
-        if (playing_ == 2) return "STUTTER";
-        if (playing_ == 1) return "PLAY WORD";
+        if (playing_.load() == 2) return "STUTTER";
+        if (playing_.load() == 1) return "PLAY WORD";
+        if (pendingPlay_) return "GETTING IT READY...";
+        if (nothing_.load()) return "NOTHING HEARD - TURN THRESHOLD LEFT";
         if (saved_.load() > 0 && savedShow_.load())
         { std::snprintf(b, sizeof b, "SAVED  Stutter %03d.wav", saved_.load()); return b; }
         if (saveFail_.load()) return "COULDN'T SAVE - CHECK DRIVE";
-        if (!word_) return "PRESS CAPTURE";
+        if (!word_) return "PRESS CAPTURE OR GRAB";
         std::snprintf(b, sizeof b, "WORD %.2f s  -  READY", wordSecs_.load());
         return b;
     }
@@ -442,25 +507,70 @@ private:
             }
             if (saveReq_.exchange(false)) saveWav();
             if (savedShow_.load() && --savedTicks_ <= 0) { savedShow_.store(false); bump(); }
+            publishScreen();
             for (int i = 0; i < kNumParams; ++i)
                 if (notify_[i].load(std::memory_order_relaxed) && notify_[i].exchange(0)) notifyHostParameterChanged(i);
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
         }
     }
 
+    // the screen: written from this thread, so it updates even if the MPC isn't running audio
+    void publishScreen()
+    {
+        writeParam(kBpm, hostBpm_.load() / 300.0f);
+        writeParam(kSig, (float)sig_.load() / 1999.0f);
+        writeParam(kPlayhead, std::round(mpc::clamp(playhead_.load(), 0.0f, 1.0f) * 63.0f) / 63.0f);
+        const float pk = inPeak_.exchange(0.0f);
+        const float db = pk > 1e-6f ? 20.0f * std::log10(pk) : -100.0f;
+        meter_ = std::max(mpc::clamp((db + 60.0f) / 60.0f, 0.0f, 1.0f), meter_ - 0.06f);
+        writeParam(kInMeter, std::round(meter_ * 64.0f) / 64.0f);
+        const int st = capState_.load();
+        writeParam(kCapLight, (st == kRec || st == kDone) ? 1.0f : (st == kArmed || st == kWaitBeat) ? 0.5f : 0.0f);
+        const int pm = playing_.load();
+        writeParam(kPlayLight, pm == 2 ? 1.0f : pm == 1 ? 0.5f : 0.0f);
+        if (statusDirty_.exchange(false)) { statusCount_ = (statusCount_ + 1) % 1000; writeParam(kStatus, statusCount_ / 1000.0f); }
+    }
+
     void takeCapture()
     {
         const float thr = std::pow(10.0f, get(kSens) / 20.0f);
-        long len = capLen_;
-        // trim the quiet tail (leave 60 ms so the word can ring)
-        long end = len;
-        while (end > 0 && std::max(std::fabs(cap_[0][(size_t)end - 1]), std::fabs(cap_[1][(size_t)end - 1])) < thr * 0.5f) --end;
-        end = std::min(len, end + (long)(0.06f * sr_));
-        // start a few ms before the first sound
-        long start = 0;
-        while (start < end && std::max(std::fabs(cap_[0][(size_t)start]), std::fabs(cap_[1][(size_t)start])) < thr * 0.5f) ++start;
-        start = std::max(0L, start - (long)(0.004f * sr_));
+        // copy out of the 10 second memory (the audio thread keeps writing ahead of this, never over it)
+        long len = std::min(capLen_, capMax_);
+        cap_[0].resize((size_t)std::max(1L, len)); cap_[1].resize((size_t)std::max(1L, len));
+        for (long k = 0; k < len; ++k)
+        {
+            const long j = (long)((capStart_ + k) % ringN_);
+            cap_[0][(size_t)k] = ring_[0][(size_t)j]; cap_[1][(size_t)k] = ring_[1][(size_t)j];
+        }
+        if (capWord_ && capTrim_ && capStart_ + len <= total_ && capLen_ >= (long)(2.9f * sr_))
+        {
+            // GRAB in WORD mode: keep only the last sound (go back from the end to the gap before it)
+            long e = len;
+            while (e > 0 && std::max(std::fabs(cap_[0][(size_t)e - 1]), std::fabs(cap_[1][(size_t)e - 1])) < thr) --e;
+            long b = e, gap = 0;
+            while (b > 0 && gap < (long)(0.25f * sr_)) { --b; gap = std::max(std::fabs(cap_[0][(size_t)b]), std::fabs(cap_[1][(size_t)b])) < thr * 0.5f ? gap + 1 : 0; }
+            if (e > b) { cap_[0].assign(cap_[0].begin() + b, cap_[0].begin() + std::min(len, e + (long)(0.3f * sr_)));
+                         cap_[1].assign(cap_[1].begin() + b, cap_[1].begin() + std::min(len, e + (long)(0.3f * sr_)));
+                         len = (long)cap_[0].size(); }
+        }
+        // WORD: trim the quiet ends (leave 60 ms so the word can ring). Beat lengths stay exact.
+        long end = len, start = 0;
+        if (capTrim_)
+        {
+            while (end > 0 && std::max(std::fabs(cap_[0][(size_t)end - 1]), std::fabs(cap_[1][(size_t)end - 1])) < thr * 0.5f) --end;
+            end = std::min(len, end + (long)(0.06f * sr_));
+            while (start < end && std::max(std::fabs(cap_[0][(size_t)start]), std::fabs(cap_[1][(size_t)start])) < thr * 0.5f) ++start;
+            start = std::max(0L, start - (long)(0.004f * sr_));      // a few ms before the first sound
+        }
         const long wl = std::max(0L, end - start);
+        if (wl < (long)(0.03f * sr_))
+        {   // nothing worth keeping: keep the old word, say so
+            nothing_.store(true);
+            capState_.store(word_ ? kReady : kIdle);
+            bump();
+            return;
+        }
+        nothing_.store(false);
         wordL_.assign(cap_[0].begin() + start, cap_[0].begin() + start + wl);
         wordR_.assign(cap_[1].begin() + start, cap_[1].begin() + start + wl);
         // 3 ms fades so it never clicks
@@ -483,6 +593,7 @@ private:
         }
         float mx = 1e-6f; for (float v : wavePk_) mx = std::max(mx, v);
         for (int c = 0; c < kCols; ++c) writeParam(kWave1 + c, std::round(std::sqrt(wavePk_[c] / mx) * 16.0f) / 16.0f);
+        wordGen_.fetch_add(1);
         needRender_.store(true);
         capState_.store(word_ ? kReady : kIdle);
         bump();
@@ -491,6 +602,7 @@ private:
     Render* render(const Settings& s)
     {
         Render* r = new Render();
+        r->gen = wordGen_.load();
         const long wl = (long)wordL_.size();
         r->word[0] = wordL_; r->word[1] = wordR_; r->wordLen = wl;
         const double beat = 60.0 / std::max(20.0f, s.bpm) * sr_;
@@ -647,15 +759,23 @@ private:
     }
 
     // state
-    float sr_ = 44100, env_ = 0, duck_ = 1, timer_ = 0;
-    std::vector<float> cap_[2], pre_[2];
-    long capMax_ = 1, capLen_ = 0, preN_ = 1, preW_ = 0, quiet_ = 0;
+    float sr_ = 44100, env_ = 0, duck_ = 1;
+    std::vector<float> ring_[2], cap_[2];
+    long ringN_ = 1, capMax_ = 1, capLen_ = 0, capFixed_ = 0, preN_ = 1, quiet_ = 0;
+    long long total_ = 0, capStart_ = 0;
+    bool capWord_ = true, capTrim_ = true;
     std::atomic<int> capState_{kIdle};
-    bool lastCapture_ = false, lastPlayWord_ = false, lastStutter_ = false, lastSave_ = false;
-    int playing_ = 0; long playPos_ = 0;
+    bool last_[kSave + 1] = {};
+    std::atomic<int> playing_{0};
+    int pendingPlay_ = 0;
+    long playPos_ = 0;
     double lastAuto_ = -1e9;
     Render* cur_ = nullptr;
     std::atomic<Render*> pending_{nullptr}, retired_{nullptr};
+    std::atomic<float> inPeak_{0}, playhead_{0};
+    std::atomic<int> sig_{404}, wordGen_{0};
+    std::atomic<bool> nothing_{false};
+    float meter_ = 0;
     // worker-owned
     std::vector<float> wordL_, wordR_;
     bool word_ = false;

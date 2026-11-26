@@ -744,6 +744,7 @@ inline void appendCache(const std::string& folder, const std::string& rel, long 
 
 // ------------------------------------------------------------------ file browser
 struct BrowseEntry { std::string name, path; bool dir = false; };
+static const char* const kAllPrefix = "\x01ALL:";                  // marks an "all songs" list
 struct BrowseList { std::string path, title; std::vector<BrowseEntry> items; bool drives = false; };
 
 inline bool isAudioName(const std::string& n)
@@ -756,6 +757,53 @@ inline bool isAudioName(const std::string& n)
 }
 
 // every mounted drive (USB sticks, hard drives, SD cards) plus the drive the plugin lives on
+// Every real storage drive the system has mounted (internal drives, USB hard drives and flash
+// drives), read from /proc/mounts on Linux (the MPC). Found wherever they are mounted.
+inline std::vector<std::pair<std::string, std::string>> mountedDrives()
+{
+    std::vector<std::pair<std::string, std::string>> out;
+#if defined(__linux__)
+    std::FILE* f = std::fopen("/proc/mounts", "rb");
+    if (!f) return out;
+    char line[1024];
+    static const char* kFs[] = { "vfat", "exfat", "ntfs", "ntfs3", "fuseblk", "ext2", "ext3", "ext4", "hfsplus", "apfs", "btrfs", "xfs", "f2fs", "msdos", "fat" };
+    while (std::fgets(line, sizeof line, f))
+    {
+        char dev[256], mnt[512], fs[64], opts[256];
+        if (std::sscanf(line, "%255s %511s %63s %255s", dev, mnt, fs, opts) != 4) continue;
+        if (std::strncmp(dev, "/dev/", 5) != 0) continue;
+        if (std::strncmp(opts, "ro", 2) == 0 && (opts[2] == ',' || opts[2] == 0)) continue;   // read-only: system, not your drives
+        bool ok = false;
+        for (const char* k : kFs) if (std::strcmp(fs, k) == 0) ok = true;
+        if (!ok) continue;
+        std::string m;                                               // undo /proc/mounts escapes ("\040" = space)
+        for (const char* c = mnt; *c; ++c)
+        {
+            if (c[0] == '\\' && c[1] >= '0' && c[1] <= '7' && c[2] && c[3]) { m += (char)((c[1] - '0') * 64 + (c[2] - '0') * 8 + (c[3] - '0')); c += 3; }
+            else m += *c;
+        }
+        if (m == "/" || m.rfind("/opt", 0) == 0 || m.rfind("/boot", 0) == 0 || m.rfind("/etc", 0) == 0 || m.rfind("/usr", 0) == 0 || m.rfind("/var", 0) == 0
+            || m.rfind("/proc", 0) == 0 || m.rfind("/sys", 0) == 0 || m.rfind("/snap", 0) == 0) continue;
+        const size_t sl = m.find_last_of('/');
+        out.push_back({ m, sl == std::string::npos ? m : m.substr(sl + 1) });
+    }
+    std::fclose(f);
+#endif
+    return out;
+}
+// changes whenever a drive is plugged in or pulled out
+inline std::string driveSignature()
+{
+    std::string sig;
+    for (const auto& m : mountedDrives()) sig += m.first + "|";
+    for (const char* base : { "/media", "/run/media", "/mnt", "/Volumes" })
+        for (const std::string& a : listDir(base)) sig += std::string(base) + "/" + a + "|";
+#if defined(_WIN32)
+    for (char d = 'C'; d <= 'Z'; ++d) if (isDir(std::string(1, d) + ":")) sig += d;
+#endif
+    return sig;
+}
+
 inline BrowseList listDrives(const std::string& pluginFolder)
 {
     BrowseList L;
@@ -776,6 +824,8 @@ inline BrowseList listDrives(const std::string& pluginFolder)
         if (p.substr(s + 1) == "VST2 Plugins") { add(parent, "MPC Drive (" + parent.substr(parent.find_last_of('/') + 1) + ")"); break; }
         p = parent;
     }
+    // every mounted drive: the MPC's internal drives, USB hard drives, flash drives
+    for (const auto& m : mountedDrives()) add(m.first, m.second);
 #if defined(MPC_DESKTOP)
     {   // on a computer: your home folders first, then every drive
         const std::string home = homeFolder();
@@ -817,8 +867,36 @@ inline BrowseList listFolder(const std::string& path)
         if (isDir(full)) dirs.push_back({ n, full, true });
         else if (isAudioName(n)) files.push_back({ n.substr(0, n.rfind('.')), full, false });
     }
-    L.items = dirs;
+    auto byName = [](const BrowseEntry& a, const BrowseEntry& b) { return lower(a.name) < lower(b.name); };
+    std::sort(dirs.begin(), dirs.end(), byName);
+    std::sort(files.begin(), files.end(), byName);
+    // a folder with folders inside: offer every song in all of them as one list
+    if (!dirs.empty()) L.items.push_back({ "[ ALL SONGS IN HERE ]", kAllPrefix + path, true });
+    L.items.insert(L.items.end(), dirs.begin(), dirs.end());
     L.items.insert(L.items.end(), files.begin(), files.end());
+    return L;
+}
+
+// every song in a folder and the folders inside it, A to Z (up to 6000)
+inline void collectAudio(const std::string& dir, int depth, std::vector<BrowseEntry>& out)
+{
+    if (depth > 8 || out.size() >= 6000) return;
+    for (const std::string& n : listDir(dir))
+    {
+        const std::string full = dir + "/" + n;
+        if (isAudioName(n)) out.push_back({ n.substr(0, n.rfind('.')), full, false });
+        else if (n != "System Volume Information" && n != "VST2 Plugins" && isDir(full)) collectAudio(full, depth + 1, out);
+        if (out.size() >= 6000) return;
+    }
+}
+inline BrowseList listAll(const std::string& path)
+{
+    BrowseList L;
+    L.path = kAllPrefix + path;
+    const size_t s = path.find_last_of('/');
+    L.title = "ALL: " + (s == std::string::npos ? path : path.substr(s + 1));
+    collectAudio(path, 0, L.items);
+    std::sort(L.items.begin(), L.items.end(), [](const BrowseEntry& a, const BrowseEntry& b) { return lower(a.name) < lower(b.name); });
     return L;
 }
 

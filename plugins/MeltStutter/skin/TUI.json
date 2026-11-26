@@ -375,7 +375,7 @@
      "showWhenDataModelInvalid": "Show",
      "whenVisible": "WhenFocussed",
      "boundsType": "Absolute",
-     "bounds": "0 0 114 40"
+     "bounds": "0 0 88 40"
     }
    },
    {
@@ -412,14 +412,14 @@
      "showWhenDataModelInvalid": "Show",
      "whenVisible": "Always",
      "boundsType": "Absolute",
-     "bounds": "0 0 114 40"
+     "bounds": "0 0 88 40"
     }
    }
   ]
  }
 },
 {
- "key": "bcap",
+ "key": "bclear",
  "value": {
   "version": 2,
   "actions": [
@@ -455,8 +455,8 @@
      "type": "Button",
      "data": {
       "version": 2,
-      "onImage": "bcap_on.png",
-      "offImage": "bcap_off.png",
+      "onImage": "clear.png",
+      "offImage": "clear.png",
       "buttonId": 1,
       "numButtonsInGroup": 1,
       "handleName": "Data",
@@ -473,14 +473,14 @@
      "showWhenDataModelInvalid": "Show",
      "whenVisible": "Always",
      "boundsType": "Absolute",
-     "bounds": "0 0 296 58"
+     "bounds": "0 0 238 58"
     }
    }
   ]
  }
 },
 {
- "key": "bword",
+ "key": "bgrab",
  "value": {
   "version": 2,
   "actions": [
@@ -516,8 +516,8 @@
      "type": "Button",
      "data": {
       "version": 2,
-      "onImage": "bword_on.png",
-      "offImage": "bword_off.png",
+      "onImage": "bgrab_on.png",
+      "offImage": "bgrab_off.png",
       "buttonId": 1,
       "numButtonsInGroup": 1,
       "handleName": "Data",
@@ -534,68 +534,7 @@
      "showWhenDataModelInvalid": "Show",
      "whenVisible": "Always",
      "boundsType": "Absolute",
-     "bounds": "0 0 296 58"
-    }
-   }
-  ]
- }
-},
-{
- "key": "bstut",
- "value": {
-  "version": 2,
-  "actions": [
-   {
-    "version": 1,
-    "onAction": "Mouse Down",
-    "handler": "Q-Link",
-    "handleName": "Data",
-    "additionalData": ""
-   }
-  ],
-  "backgroundData": {
-   "version": 1,
-   "focussed": {
-    "version": 1,
-    "colour": "0",
-    "image": ""
-   },
-   "unfocussed": {
-    "version": 1,
-    "colour": "0",
-    "image": ""
-   }
-  },
-  "ignoreMousePresses": false,
-  "disableCoarseDataWheel": false,
-  "componentsData": [
-   {
-    "version": 2,
-    "componentData": {
-     "version": 1,
-     "name": "button",
-     "type": "Button",
-     "data": {
-      "version": 2,
-      "onImage": "bstut_on.png",
-      "offImage": "bstut_off.png",
-      "buttonId": 1,
-      "numButtonsInGroup": 1,
-      "handleName": "Data",
-      "gestureBehaviour": "Instant"
-     }
-    },
-    "handle remapping": {
-     "version": 1,
-     "map": []
-    },
-    "bounds": {
-     "version": 1,
-     "acceptsHWFocus": "No",
-     "showWhenDataModelInvalid": "Show",
-     "whenVisible": "Always",
-     "boundsType": "Absolute",
-     "bounds": "0 0 296 58"
+     "bounds": "0 0 238 58"
     }
    }
   ]
@@ -656,7 +595,7 @@
      "showWhenDataModelInvalid": "Show",
      "whenVisible": "Always",
      "boundsType": "Absolute",
-     "bounds": "0 0 296 58"
+     "bounds": "0 0 238 58"
     }
    }
   ]
@@ -910,7 +849,7 @@
 },
 "replacementStrings": [
  {
-  "key": "Parameter 4",
+  "key": "Parameter 6",
   "value": [
    "2",
    "3",
@@ -922,7 +861,7 @@
   ]
  },
  {
-  "key": "Parameter 5",
+  "key": "Parameter 7",
   "value": [
    "1/4",
    "1/8",
@@ -933,7 +872,7 @@
   ]
  },
  {
-  "key": "Parameter 20",
+  "key": "Parameter 22",
   "value": [
    "Off",
    "1 Bar",
@@ -942,35 +881,38 @@
   ]
  },
  {
-  "key": "Parameter 21",
+  "key": "Parameter 23",
   "value": [
    "Over",
    "Replace"
   ]
  },
  {
-  "key": "Parameter 11",
+  "key": "Parameter 25",
+  "value": [
+   "Word",
+   "1 Beat",
+   "2 Beats",
+   "1 Bar",
+   "2 Bars"
+  ]
+ },
+ {
+  "key": "Parameter 13",
   "value": [
    "Off",
    "On"
   ]
  },
  {
-  "key": "Parameter 14",
+  "key": "Parameter 16",
   "value": [
    "Off",
    "On"
   ]
  },
  {
-  "key": "Parameter 17",
-  "value": [
-   "Off",
-   "On"
-  ]
- },
- {
-  "key": "Parameter 0",
+  "key": "Parameter 19",
   "value": [
    "Off",
    "On"
@@ -1007,7 +949,7 @@
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "v23",
+      "name": "v0",
       "type": "Label",
       "data": {
        "version": 1,
@@ -1017,7 +959,7 @@
          "version": 1,
          "name": "Roboto",
          "style": "Bold",
-         "height": 18.0
+         "height": 15.0
         },
         "colour": "FFFFAC40",
         "justification": "horizontallyCentred verticallyCentred",
@@ -1032,7 +974,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 23"
+        "value": "Parameter 0"
        }
       ]
      },
@@ -1042,157 +984,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "404 16 484 42"
-     }
-    },
-    {
-     "version": 2,
-     "componentData": {
-      "version": 1,
-      "name": "v24",
-      "type": "Label",
-      "data": {
-       "version": 1,
-       "textStyle": {
-        "version": 1,
-        "font": {
-         "version": 1,
-         "name": "Roboto",
-         "style": "Bold",
-         "height": 22.0
-        },
-        "colour": "FFEEE4F4",
-        "justification": "left verticallyCentred",
-        "case": "Original"
-       },
-       "type": "Value",
-       "handleName": "Data"
-      }
-     },
-     "handle remapping": {
-      "version": 1,
-      "map": [
-       {
-        "key": "Data",
-        "value": "Parameter 24"
-       }
-      ]
-     },
-     "bounds": {
-      "version": 1,
-      "acceptsHWFocus": "No",
-      "showWhenDataModelInvalid": "Show",
-      "whenVisible": "Always",
-      "boundsType": "Absolute",
-      "bounds": "952 16 80 42"
-     }
-    },
-    {
-     "version": 2,
-     "componentData": {
-      "version": 1,
-      "name": "v25",
-      "type": "Label",
-      "data": {
-       "version": 1,
-       "textStyle": {
-        "version": 1,
-        "font": {
-         "version": 1,
-         "name": "Roboto",
-         "style": "Bold",
-         "height": 22.0
-        },
-        "colour": "FFEEE4F4",
-        "justification": "left verticallyCentred",
-        "case": "Original"
-       },
-       "type": "Value",
-       "handleName": "Data"
-      }
-     },
-     "handle remapping": {
-      "version": 1,
-      "map": [
-       {
-        "key": "Data",
-        "value": "Parameter 25"
-       }
-      ]
-     },
-     "bounds": {
-      "version": 1,
-      "acceptsHWFocus": "No",
-      "showWhenDataModelInvalid": "Show",
-      "whenVisible": "Always",
-      "boundsType": "Absolute",
-      "bounds": "1120 16 80 42"
-     }
-    },
-    {
-     "version": 2,
-     "componentData": {
-      "version": 1,
-      "name": "i28",
-      "type": "Image",
-      "data": {
-       "version": 2,
-       "imageType": "FilmStrip",
-       "colour": "0",
-       "image": "wavebar.png",
-       "numFrames": 17,
-       "handleName": "Data"
-      }
-     },
-     "handle remapping": {
-      "version": 1,
-      "map": [
-       {
-        "key": "Data",
-        "value": "Parameter 28"
-       }
-      ]
-     },
-     "bounds": {
-      "version": 1,
-      "acceptsHWFocus": "No",
-      "showWhenDataModelInvalid": "Show",
-      "whenVisible": "Always",
-      "boundsType": "Absolute",
-      "bounds": "34 82 21 170"
-     }
-    },
-    {
-     "version": 2,
-     "componentData": {
-      "version": 1,
-      "name": "i29",
-      "type": "Image",
-      "data": {
-       "version": 2,
-       "imageType": "FilmStrip",
-       "colour": "0",
-       "image": "wavebar.png",
-       "numFrames": 17,
-       "handleName": "Data"
-      }
-     },
-     "handle remapping": {
-      "version": 1,
-      "map": [
-       {
-        "key": "Data",
-        "value": "Parameter 29"
-       }
-      ]
-     },
-     "bounds": {
-      "version": 1,
-      "acceptsHWFocus": "No",
-      "showWhenDataModelInvalid": "Show",
-      "whenVisible": "Always",
-      "boundsType": "Absolute",
-      "bounds": "59 82 21 170"
+      "bounds": "400 16 364 42"
      }
     },
     {
@@ -1205,8 +997,8 @@
        "version": 2,
        "imageType": "FilmStrip",
        "colour": "0",
-       "image": "wavebar.png",
-       "numFrames": 17,
+       "image": "inmeter.png",
+       "numFrames": 65,
        "handleName": "Data"
       }
      },
@@ -1225,21 +1017,21 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "85 82 21 170"
+      "bounds": "812 31 80 12"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "i31",
+      "name": "i24",
       "type": "Image",
       "data": {
        "version": 2,
        "imageType": "FilmStrip",
        "colour": "0",
-       "image": "wavebar.png",
-       "numFrames": 17,
+       "image": "thrmark.png",
+       "numFrames": 41,
        "handleName": "Data"
       }
      },
@@ -1248,7 +1040,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 31"
+        "value": "Parameter 24"
        }
       ]
      },
@@ -1258,21 +1050,30 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "110 82 21 170"
+      "bounds": "812 31 80 12"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "i32",
-      "type": "Image",
+      "name": "v26",
+      "type": "Label",
       "data": {
-       "version": 2,
-       "imageType": "FilmStrip",
-       "colour": "0",
-       "image": "wavebar.png",
-       "numFrames": 17,
+       "version": 1,
+       "textStyle": {
+        "version": 1,
+        "font": {
+         "version": 1,
+         "name": "Roboto",
+         "style": "Bold",
+         "height": 22.0
+        },
+        "colour": "FFEEE4F4",
+        "justification": "left verticallyCentred",
+        "case": "Original"
+       },
+       "type": "Value",
        "handleName": "Data"
       }
      },
@@ -1281,7 +1082,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 32"
+        "value": "Parameter 26"
        }
       ]
      },
@@ -1291,7 +1092,49 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "135 82 21 170"
+      "bounds": "952 16 80 42"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "v27",
+      "type": "Label",
+      "data": {
+       "version": 1,
+       "textStyle": {
+        "version": 1,
+        "font": {
+         "version": 1,
+         "name": "Roboto",
+         "style": "Bold",
+         "height": 22.0
+        },
+        "colour": "FFEEE4F4",
+        "justification": "left verticallyCentred",
+        "case": "Original"
+       },
+       "type": "Value",
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 27"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "1120 16 80 42"
      }
     },
     {
@@ -1324,7 +1167,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "161 82 21 170"
+      "bounds": "34 82 21 170"
      }
     },
     {
@@ -1357,7 +1200,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "186 82 21 170"
+      "bounds": "59 82 21 170"
      }
     },
     {
@@ -1390,7 +1233,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "211 82 21 170"
+      "bounds": "85 82 21 170"
      }
     },
     {
@@ -1423,7 +1266,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "237 82 21 170"
+      "bounds": "110 82 21 170"
      }
     },
     {
@@ -1456,7 +1299,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "262 82 21 170"
+      "bounds": "135 82 21 170"
      }
     },
     {
@@ -1489,7 +1332,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "287 82 21 170"
+      "bounds": "161 82 21 170"
      }
     },
     {
@@ -1522,7 +1365,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "313 82 21 170"
+      "bounds": "186 82 21 170"
      }
     },
     {
@@ -1555,7 +1398,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "338 82 21 170"
+      "bounds": "211 82 21 170"
      }
     },
     {
@@ -1588,7 +1431,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "363 82 21 170"
+      "bounds": "237 82 21 170"
      }
     },
     {
@@ -1621,7 +1464,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "389 82 21 170"
+      "bounds": "262 82 21 170"
      }
     },
     {
@@ -1654,7 +1497,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "414 82 21 170"
+      "bounds": "287 82 21 170"
      }
     },
     {
@@ -1687,7 +1530,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "439 82 21 170"
+      "bounds": "313 82 21 170"
      }
     },
     {
@@ -1720,7 +1563,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "465 82 21 170"
+      "bounds": "338 82 21 170"
      }
     },
     {
@@ -1753,7 +1596,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "490 82 21 170"
+      "bounds": "363 82 21 170"
      }
     },
     {
@@ -1786,7 +1629,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "515 82 21 170"
+      "bounds": "389 82 21 170"
      }
     },
     {
@@ -1819,7 +1662,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "541 82 21 170"
+      "bounds": "414 82 21 170"
      }
     },
     {
@@ -1852,7 +1695,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "566 82 21 170"
+      "bounds": "439 82 21 170"
      }
     },
     {
@@ -1885,7 +1728,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "591 82 21 170"
+      "bounds": "465 82 21 170"
      }
     },
     {
@@ -1918,7 +1761,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "617 82 21 170"
+      "bounds": "490 82 21 170"
      }
     },
     {
@@ -1951,7 +1794,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "642 82 21 170"
+      "bounds": "515 82 21 170"
      }
     },
     {
@@ -1984,7 +1827,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "667 82 21 170"
+      "bounds": "541 82 21 170"
      }
     },
     {
@@ -2017,7 +1860,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "693 82 21 170"
+      "bounds": "566 82 21 170"
      }
     },
     {
@@ -2050,7 +1893,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "718 82 21 170"
+      "bounds": "591 82 21 170"
      }
     },
     {
@@ -2083,7 +1926,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "743 82 21 170"
+      "bounds": "617 82 21 170"
      }
     },
     {
@@ -2116,7 +1959,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "769 82 21 170"
+      "bounds": "642 82 21 170"
      }
     },
     {
@@ -2149,7 +1992,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "794 82 21 170"
+      "bounds": "667 82 21 170"
      }
     },
     {
@@ -2182,7 +2025,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "819 82 21 170"
+      "bounds": "693 82 21 170"
      }
     },
     {
@@ -2215,7 +2058,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "845 82 21 170"
+      "bounds": "718 82 21 170"
      }
     },
     {
@@ -2248,7 +2091,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "870 82 21 170"
+      "bounds": "743 82 21 170"
      }
     },
     {
@@ -2281,7 +2124,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "895 82 21 170"
+      "bounds": "769 82 21 170"
      }
     },
     {
@@ -2314,7 +2157,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "921 82 21 170"
+      "bounds": "794 82 21 170"
      }
     },
     {
@@ -2347,7 +2190,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "946 82 21 170"
+      "bounds": "819 82 21 170"
      }
     },
     {
@@ -2380,7 +2223,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "971 82 21 170"
+      "bounds": "845 82 21 170"
      }
     },
     {
@@ -2413,7 +2256,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "997 82 21 170"
+      "bounds": "870 82 21 170"
      }
     },
     {
@@ -2446,7 +2289,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1022 82 21 170"
+      "bounds": "895 82 21 170"
      }
     },
     {
@@ -2479,7 +2322,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1047 82 21 170"
+      "bounds": "921 82 21 170"
      }
     },
     {
@@ -2512,7 +2355,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1073 82 21 170"
+      "bounds": "946 82 21 170"
      }
     },
     {
@@ -2545,7 +2388,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1098 82 21 170"
+      "bounds": "971 82 21 170"
      }
     },
     {
@@ -2578,7 +2421,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1123 82 21 170"
+      "bounds": "997 82 21 170"
      }
     },
     {
@@ -2611,7 +2454,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1149 82 21 170"
+      "bounds": "1022 82 21 170"
      }
     },
     {
@@ -2644,7 +2487,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1174 82 21 170"
+      "bounds": "1047 82 21 170"
      }
     },
     {
@@ -2677,7 +2520,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1199 82 21 170"
+      "bounds": "1073 82 21 170"
      }
     },
     {
@@ -2710,6 +2553,171 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
+      "bounds": "1098 82 21 170"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "i76",
+      "type": "Image",
+      "data": {
+       "version": 2,
+       "imageType": "FilmStrip",
+       "colour": "0",
+       "image": "wavebar.png",
+       "numFrames": 17,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 76"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "1123 82 21 170"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "i77",
+      "type": "Image",
+      "data": {
+       "version": 2,
+       "imageType": "FilmStrip",
+       "colour": "0",
+       "image": "wavebar.png",
+       "numFrames": 17,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 77"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "1149 82 21 170"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "i78",
+      "type": "Image",
+      "data": {
+       "version": 2,
+       "imageType": "FilmStrip",
+       "colour": "0",
+       "image": "wavebar.png",
+       "numFrames": 17,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 78"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "1174 82 21 170"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "i79",
+      "type": "Image",
+      "data": {
+       "version": 2,
+       "imageType": "FilmStrip",
+       "colour": "0",
+       "image": "wavebar.png",
+       "numFrames": 17,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 79"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "1199 82 21 170"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "i80",
+      "type": "Image",
+      "data": {
+       "version": 2,
+       "imageType": "FilmStrip",
+       "colour": "0",
+       "image": "wavebar.png",
+       "numFrames": 17,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 80"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
       "bounds": "1225 82 21 170"
      }
     },
@@ -2717,7 +2725,7 @@
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "i27",
+      "name": "i29",
       "type": "Image",
       "data": {
        "version": 2,
@@ -2733,7 +2741,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 27"
+        "value": "Parameter 29"
        }
       ]
      },
@@ -2750,7 +2758,7 @@
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "i26",
+      "name": "i28",
       "type": "Image",
       "data": {
        "version": 2,
@@ -2766,7 +2774,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 26"
+        "value": "Parameter 28"
        }
       ]
      },
@@ -2783,10 +2791,14 @@
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "c0",
-      "type": "bcap",
+      "name": "i31",
+      "type": "Image",
       "data": {
-       "version": 1,
+       "version": 2,
+       "imageType": "FilmStrip",
+       "colour": "0",
+       "image": "bcap.png",
+       "numFrames": 3,
        "handleName": "Data"
       }
      },
@@ -2795,25 +2807,25 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 0"
+        "value": "Parameter 31"
        }
       ]
      },
      "bounds": {
       "version": 1,
-      "acceptsHWFocus": "Yes",
-      "showWhenDataModelInvalid": "Hide",
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "16 274 296 58"
+      "bounds": "16 274 238 58"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "c1",
-      "type": "bword",
+      "name": "b1",
+      "type": "bclear",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -2834,7 +2846,7 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "326 274 296 58"
+      "bounds": "16 274 238 58"
      }
     },
     {
@@ -2842,7 +2854,7 @@
      "componentData": {
       "version": 1,
       "name": "c2",
-      "type": "bstut",
+      "type": "bgrab",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -2863,15 +2875,48 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "636 274 296 58"
+      "bounds": "268 274 238 58"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "c3",
-      "type": "bsave",
+      "name": "i32",
+      "type": "Image",
+      "data": {
+       "version": 2,
+       "imageType": "FilmStrip",
+       "colour": "0",
+       "image": "bword.png",
+       "numFrames": 3,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 32"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "520 274 238 58"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "b3",
+      "type": "bclear",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -2892,15 +2937,48 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "946 274 296 58"
+      "bounds": "520 274 238 58"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "m4",
-      "type": "menu",
+      "name": "i32",
+      "type": "Image",
+      "data": {
+       "version": 2,
+       "imageType": "FilmStrip",
+       "colour": "0",
+       "image": "bstut.png",
+       "numFrames": 3,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 32"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "772 274 238 58"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "b4",
+      "type": "bclear",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -2911,7 +2989,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 4"
+        "value": "ResetOnGestureEnd/Parameter 4"
        }
       ]
      },
@@ -2921,15 +2999,15 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "32 398 114 40"
+      "bounds": "772 274 238 58"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "m5",
-      "type": "menu",
+      "name": "c5",
+      "type": "bsave",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -2940,7 +3018,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 5"
+        "value": "ResetOnGestureEnd/Parameter 5"
        }
       ]
      },
@@ -2950,73 +3028,15 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "180 398 114 40"
+      "bounds": "1024 274 238 58"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "m20",
+      "name": "m6",
       "type": "menu",
-      "data": {
-       "version": 1,
-       "handleName": "Data"
-      }
-     },
-     "handle remapping": {
-      "version": 1,
-      "map": [
-       {
-        "key": "Data",
-        "value": "Parameter 20"
-       }
-      ]
-     },
-     "bounds": {
-      "version": 1,
-      "acceptsHWFocus": "Yes",
-      "showWhenDataModelInvalid": "Hide",
-      "whenVisible": "Always",
-      "boundsType": "Absolute",
-      "bounds": "328 398 114 40"
-     }
-    },
-    {
-     "version": 2,
-     "componentData": {
-      "version": 1,
-      "name": "m21",
-      "type": "menu",
-      "data": {
-       "version": 1,
-       "handleName": "Data"
-      }
-     },
-     "handle remapping": {
-      "version": 1,
-      "map": [
-       {
-        "key": "Data",
-        "value": "Parameter 21"
-       }
-      ]
-     },
-     "bounds": {
-      "version": 1,
-      "acceptsHWFocus": "Yes",
-      "showWhenDataModelInvalid": "Hide",
-      "whenVisible": "Always",
-      "boundsType": "Absolute",
-      "bounds": "476 398 114 40"
-     }
-    },
-    {
-     "version": 2,
-     "componentData": {
-      "version": 1,
-      "name": "c6",
-      "type": "km",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -3037,57 +3057,15 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "34 456 84 84"
+      "bounds": "32 398 88 40"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "v6",
-      "type": "Label",
-      "data": {
-       "version": 1,
-       "textStyle": {
-        "version": 1,
-        "font": {
-         "version": 1,
-         "name": "Roboto",
-         "style": "Bold",
-         "height": 13.0
-        },
-        "colour": "FFEEE4F4",
-        "justification": "horizontallyCentred verticallyCentred",
-        "case": "Original"
-       },
-       "type": "Value",
-       "handleName": "Data"
-      }
-     },
-     "handle remapping": {
-      "version": 1,
-      "map": [
-       {
-        "key": "Data",
-        "value": "Parameter 6"
-       }
-      ]
-     },
-     "bounds": {
-      "version": 1,
-      "acceptsHWFocus": "No",
-      "showWhenDataModelInvalid": "Show",
-      "whenVisible": "Always",
-      "boundsType": "Absolute",
-      "bounds": "26 566 100 22"
-     }
-    },
-    {
-     "version": 2,
-     "componentData": {
-      "version": 1,
-      "name": "c7",
-      "type": "km",
+      "name": "m7",
+      "type": "menu",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -3108,57 +3086,15 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "152 456 84 84"
+      "bounds": "150 398 88 40"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "v7",
-      "type": "Label",
-      "data": {
-       "version": 1,
-       "textStyle": {
-        "version": 1,
-        "font": {
-         "version": 1,
-         "name": "Roboto",
-         "style": "Bold",
-         "height": 13.0
-        },
-        "colour": "FFEEE4F4",
-        "justification": "horizontallyCentred verticallyCentred",
-        "case": "Original"
-       },
-       "type": "Value",
-       "handleName": "Data"
-      }
-     },
-     "handle remapping": {
-      "version": 1,
-      "map": [
-       {
-        "key": "Data",
-        "value": "Parameter 7"
-       }
-      ]
-     },
-     "bounds": {
-      "version": 1,
-      "acceptsHWFocus": "No",
-      "showWhenDataModelInvalid": "Show",
-      "whenVisible": "Always",
-      "boundsType": "Absolute",
-      "bounds": "144 566 100 22"
-     }
-    },
-    {
-     "version": 2,
-     "componentData": {
-      "version": 1,
-      "name": "c9",
-      "type": "km",
+      "name": "m22",
+      "type": "menu",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -3169,7 +3105,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 9"
+        "value": "Parameter 22"
        }
       ]
      },
@@ -3179,57 +3115,15 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "270 456 84 84"
+      "bounds": "268 398 88 40"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "v9",
-      "type": "Label",
-      "data": {
-       "version": 1,
-       "textStyle": {
-        "version": 1,
-        "font": {
-         "version": 1,
-         "name": "Roboto",
-         "style": "Bold",
-         "height": 13.0
-        },
-        "colour": "FFEEE4F4",
-        "justification": "horizontallyCentred verticallyCentred",
-        "case": "Original"
-       },
-       "type": "Value",
-       "handleName": "Data"
-      }
-     },
-     "handle remapping": {
-      "version": 1,
-      "map": [
-       {
-        "key": "Data",
-        "value": "Parameter 9"
-       }
-      ]
-     },
-     "bounds": {
-      "version": 1,
-      "acceptsHWFocus": "No",
-      "showWhenDataModelInvalid": "Show",
-      "whenVisible": "Always",
-      "boundsType": "Absolute",
-      "bounds": "262 566 100 22"
-     }
-    },
-    {
-     "version": 2,
-     "componentData": {
-      "version": 1,
-      "name": "c10",
-      "type": "km",
+      "name": "m23",
+      "type": "menu",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -3240,7 +3134,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 10"
+        "value": "Parameter 23"
        }
       ]
      },
@@ -3250,30 +3144,17 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "388 456 84 84"
+      "bounds": "386 398 88 40"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "v10",
-      "type": "Label",
+      "name": "m25",
+      "type": "menu",
       "data": {
        "version": 1,
-       "textStyle": {
-        "version": 1,
-        "font": {
-         "version": 1,
-         "name": "Roboto",
-         "style": "Bold",
-         "height": 13.0
-        },
-        "colour": "FFEEE4F4",
-        "justification": "horizontallyCentred verticallyCentred",
-        "case": "Original"
-       },
-       "type": "Value",
        "handleName": "Data"
       }
      },
@@ -3282,17 +3163,17 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 10"
+        "value": "Parameter 25"
        }
       ]
      },
      "bounds": {
       "version": 1,
-      "acceptsHWFocus": "No",
-      "showWhenDataModelInvalid": "Show",
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "380 566 100 22"
+      "bounds": "504 398 88 40"
      }
     },
     {
@@ -3321,7 +3202,7 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "506 456 84 84"
+      "bounds": "34 456 84 84"
      }
     },
     {
@@ -3363,7 +3244,78 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "498 566 100 22"
+      "bounds": "26 566 100 22"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "c9",
+      "type": "km",
+      "data": {
+       "version": 1,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 9"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "152 456 84 84"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "v9",
+      "type": "Label",
+      "data": {
+       "version": 1,
+       "textStyle": {
+        "version": 1,
+        "font": {
+         "version": 1,
+         "name": "Roboto",
+         "style": "Bold",
+         "height": 13.0
+        },
+        "colour": "FFEEE4F4",
+        "justification": "horizontallyCentred verticallyCentred",
+        "case": "Original"
+       },
+       "type": "Value",
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 9"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "144 566 100 22"
      }
     },
     {
@@ -3371,7 +3323,7 @@
      "componentData": {
       "version": 1,
       "name": "c11",
-      "type": "pill",
+      "type": "km",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -3392,7 +3344,49 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "772 380 58 28"
+      "bounds": "270 456 84 84"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "v11",
+      "type": "Label",
+      "data": {
+       "version": 1,
+       "textStyle": {
+        "version": 1,
+        "font": {
+         "version": 1,
+         "name": "Roboto",
+         "style": "Bold",
+         "height": 13.0
+        },
+        "colour": "FFEEE4F4",
+        "justification": "horizontallyCentred verticallyCentred",
+        "case": "Original"
+       },
+       "type": "Value",
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 11"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "262 566 100 22"
      }
     },
     {
@@ -3400,7 +3394,7 @@
      "componentData": {
       "version": 1,
       "name": "c12",
-      "type": "ka",
+      "type": "km",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -3421,7 +3415,7 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "670 440 64 64"
+      "bounds": "388 456 84 84"
      }
     },
     {
@@ -3438,7 +3432,7 @@
          "version": 1,
          "name": "Roboto",
          "style": "Bold",
-         "height": 12.0
+         "height": 13.0
         },
         "colour": "FFEEE4F4",
         "justification": "horizontallyCentred verticallyCentred",
@@ -3463,7 +3457,78 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "662 530 80 20"
+      "bounds": "380 566 100 22"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "c10",
+      "type": "km",
+      "data": {
+       "version": 1,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 10"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "506 456 84 84"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "v10",
+      "type": "Label",
+      "data": {
+       "version": 1,
+       "textStyle": {
+        "version": 1,
+        "font": {
+         "version": 1,
+         "name": "Roboto",
+         "style": "Bold",
+         "height": 13.0
+        },
+        "colour": "FFEEE4F4",
+        "justification": "horizontallyCentred verticallyCentred",
+        "case": "Original"
+       },
+       "type": "Value",
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 10"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "498 566 100 22"
      }
     },
     {
@@ -3471,7 +3536,7 @@
      "componentData": {
       "version": 1,
       "name": "c13",
-      "type": "ka",
+      "type": "pill",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -3492,49 +3557,7 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "762 440 64 64"
-     }
-    },
-    {
-     "version": 2,
-     "componentData": {
-      "version": 1,
-      "name": "v13",
-      "type": "Label",
-      "data": {
-       "version": 1,
-       "textStyle": {
-        "version": 1,
-        "font": {
-         "version": 1,
-         "name": "Roboto",
-         "style": "Bold",
-         "height": 12.0
-        },
-        "colour": "FFEEE4F4",
-        "justification": "horizontallyCentred verticallyCentred",
-        "case": "Original"
-       },
-       "type": "Value",
-       "handleName": "Data"
-      }
-     },
-     "handle remapping": {
-      "version": 1,
-      "map": [
-       {
-        "key": "Data",
-        "value": "Parameter 13"
-       }
-      ]
-     },
-     "bounds": {
-      "version": 1,
-      "acceptsHWFocus": "No",
-      "showWhenDataModelInvalid": "Show",
-      "whenVisible": "Always",
-      "boundsType": "Absolute",
-      "bounds": "754 530 80 20"
+      "bounds": "772 380 58 28"
      }
     },
     {
@@ -3542,7 +3565,7 @@
      "componentData": {
       "version": 1,
       "name": "c14",
-      "type": "pill",
+      "type": "ka",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -3563,7 +3586,49 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "978 380 58 28"
+      "bounds": "670 440 64 64"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "v14",
+      "type": "Label",
+      "data": {
+       "version": 1,
+       "textStyle": {
+        "version": 1,
+        "font": {
+         "version": 1,
+         "name": "Roboto",
+         "style": "Bold",
+         "height": 12.0
+        },
+        "colour": "FFEEE4F4",
+        "justification": "horizontallyCentred verticallyCentred",
+        "case": "Original"
+       },
+       "type": "Value",
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 14"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "662 530 80 20"
      }
     },
     {
@@ -3592,7 +3657,7 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "876 440 64 64"
+      "bounds": "762 440 64 64"
      }
     },
     {
@@ -3634,7 +3699,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "868 530 80 20"
+      "bounds": "754 530 80 20"
      }
     },
     {
@@ -3642,7 +3707,7 @@
      "componentData": {
       "version": 1,
       "name": "c16",
-      "type": "ka",
+      "type": "pill",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -3663,14 +3728,43 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "968 440 64 64"
+      "bounds": "978 380 58 28"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "v16",
+      "name": "c17",
+      "type": "ka",
+      "data": {
+       "version": 1,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 17"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "876 440 64 64"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "v17",
       "type": "Label",
       "data": {
        "version": 1,
@@ -3695,7 +3789,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 16"
+        "value": "Parameter 17"
        }
       ]
      },
@@ -3705,36 +3799,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "960 530 80 20"
-     }
-    },
-    {
-     "version": 2,
-     "componentData": {
-      "version": 1,
-      "name": "c17",
-      "type": "pill",
-      "data": {
-       "version": 1,
-       "handleName": "Data"
-      }
-     },
-     "handle remapping": {
-      "version": 1,
-      "map": [
-       {
-        "key": "Data",
-        "value": "Parameter 17"
-       }
-      ]
-     },
-     "bounds": {
-      "version": 1,
-      "acceptsHWFocus": "Yes",
-      "showWhenDataModelInvalid": "Hide",
-      "whenVisible": "Always",
-      "boundsType": "Absolute",
-      "bounds": "1184 380 58 28"
+      "bounds": "868 530 80 20"
      }
     },
     {
@@ -3763,7 +3828,7 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1082 440 64 64"
+      "bounds": "968 440 64 64"
      }
     },
     {
@@ -3805,7 +3870,7 @@
       "showWhenDataModelInvalid": "Show",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1074 530 80 20"
+      "bounds": "960 530 80 20"
      }
     },
     {
@@ -3813,7 +3878,7 @@
      "componentData": {
       "version": 1,
       "name": "c19",
-      "type": "ka",
+      "type": "pill",
       "data": {
        "version": 1,
        "handleName": "Data"
@@ -3834,14 +3899,43 @@
       "showWhenDataModelInvalid": "Hide",
       "whenVisible": "Always",
       "boundsType": "Absolute",
-      "bounds": "1174 440 64 64"
+      "bounds": "1184 380 58 28"
      }
     },
     {
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "v19",
+      "name": "c20",
+      "type": "ka",
+      "data": {
+       "version": 1,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 20"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "1082 440 64 64"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "v20",
       "type": "Label",
       "data": {
        "version": 1,
@@ -3866,7 +3960,78 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 19"
+        "value": "Parameter 20"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "No",
+      "showWhenDataModelInvalid": "Show",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "1074 530 80 20"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "c21",
+      "type": "ka",
+      "data": {
+       "version": 1,
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 21"
+       }
+      ]
+     },
+     "bounds": {
+      "version": 1,
+      "acceptsHWFocus": "Yes",
+      "showWhenDataModelInvalid": "Hide",
+      "whenVisible": "Always",
+      "boundsType": "Absolute",
+      "bounds": "1174 440 64 64"
+     }
+    },
+    {
+     "version": 2,
+     "componentData": {
+      "version": 1,
+      "name": "v21",
+      "type": "Label",
+      "data": {
+       "version": 1,
+       "textStyle": {
+        "version": 1,
+        "font": {
+         "version": 1,
+         "name": "Roboto",
+         "style": "Bold",
+         "height": 12.0
+        },
+        "colour": "FFEEE4F4",
+        "justification": "horizontallyCentred verticallyCentred",
+        "case": "Original"
+       },
+       "type": "Value",
+       "handleName": "Data"
+      }
+     },
+     "handle remapping": {
+      "version": 1,
+      "map": [
+       {
+        "key": "Data",
+        "value": "Parameter 21"
        }
       ]
      },
@@ -3916,7 +4081,7 @@
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "c22",
+      "name": "c24",
       "type": "kbig",
       "data": {
        "version": 1,
@@ -3928,7 +4093,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 22"
+        "value": "Parameter 24"
        }
       ]
      },
@@ -3945,7 +4110,7 @@
      "version": 2,
      "componentData": {
       "version": 1,
-      "name": "v22",
+      "name": "v24",
       "type": "Label",
       "data": {
        "version": 1,
@@ -3970,7 +4135,7 @@
       "map": [
        {
         "key": "Data",
-        "value": "Parameter 22"
+        "value": "Parameter 24"
        }
       ]
      },
